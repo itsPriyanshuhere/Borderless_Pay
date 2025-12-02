@@ -1,6 +1,6 @@
 import { Chain } from 'wagmi/chains';
 
-export const QIE_TESTNET_ID = 1983; // QIE Testnet chainId (provided by user)
+export const QIE_TESTNET_ID = 1983;
 export const SEPOLIA_ID = 11155111;
 
 const VITE_QIE_RPC = (import.meta.env.VITE_QIE_RPC_URL as string) || (import.meta.env.REACT_APP_QIE_RPC_URL as string) || 'https://rpc1testnet.qie.digital/';
@@ -19,7 +19,7 @@ export const qieTestnet = {
         public: { http: [VITE_QIE_RPC] },
     },
     blockExplorers: {
-        default: { name: 'QIE Explorer', url: 'https://testnet.qie.digital/' }, // Official explorer provided by user
+        default: { name: 'QIE Explorer', url: 'https://testnet.qie.digital/' },
     },
     testnet: true,
 } as const satisfies Chain;

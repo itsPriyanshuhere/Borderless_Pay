@@ -1,3 +1,5 @@
+// For view - would be integrated in the backend service managing scheduled payrolls for future
+
 import cron from 'node-cron';
 import config from '../config';
 import blockchainService from './blockchain.service';
@@ -35,7 +37,6 @@ class SchedulerService {
                 console.log(`   Employees paid: ${this.employeeAddresses.length}\n`);
             } catch (error: any) {
                 console.error('Scheduled payroll failed:', error.message);
-                // In production, you would send notifications here
             }
         });
 
@@ -54,7 +55,7 @@ class SchedulerService {
 
     // Get next scheduled run time
     getNextRunTime(): string {
-        // This is a simplified version - for production use a proper cron parser
+        
         return 'Check cron schedule configuration';
     }
 

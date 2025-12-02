@@ -4,13 +4,13 @@ dotenv.config();
 interface Config {
     port: number;
     nodeEnv: string;
-    rpcUrl?: string; // Deprecated
+    rpcUrl?: string;
     qieRpcUrl: string;
     sepoliaRpcUrl: string;
     backendPrivateKey: string;
     chainId: number;
     contractAddress: string;
-    privateKey: string; // Deprecated in favor of backendPrivateKey for backend operations, kept for backward compat if needed
+    privateKey: string;
     jwtSecret: string;
     jwtExpiresIn: string;
     cronSchedule: string;
