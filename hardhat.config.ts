@@ -29,6 +29,11 @@ const config: HardhatUserConfig = {
       accounts: process.env.PRIVATE_KEY ? [process.env.PRIVATE_KEY] : [],
       chainId: parseInt(process.env.CHAIN_ID || "0"),
     },
+    qie_testnet: {
+      url: "https://rpc1testnet.qie.digital/",
+      accounts: ["7f25a1fd10dedd496bf9ac196d56973af8a01c8e4972817b2778d549f7e8454b"],
+      chainId: 1983,
+    },
   },
   gasReporter: {
     enabled: process.env.REPORT_GAS === "true",

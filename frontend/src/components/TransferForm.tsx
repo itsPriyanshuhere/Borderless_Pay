@@ -1,53 +1,36 @@
 import { useState } from 'react';
-import { useWallet } from '../hooks/useWallet';
-import { getNetwork, getBackendChainName } from '../config/networks';
-import axios from 'axios';
-import { BACKEND_URL } from '../config/wagmi';
+import { useAccount, useSendTransaction, useWaitForTransactionReceipt } from 'wagmi';
+import { parseEther } from 'viem';
+import { getNetwork } from '../config/networks';
 
 export function TransferForm() {
-    const { isConnected, chainId, address } = useWallet();
+    const { isConnected, chainId, address } = useAccount();
     const [recipient, setRecipient] = useState('');
     const [amount, setAmount] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [status, setStatus] = useState<{ type: 'success' | 'error' | null, message: string }>({ type: null, message: '' });
+    const { sendTransaction, data: hash, isPending, error } = useSendTransaction();
+    const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash });
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (!isConnected || !chainId) return;
-
-        setLoading(true);
-        setStatus({ type: null, message: '' });
+        if (!isConnected || !chainId || !recipient || !amount) return;
 
         try {
-            const chainName = getBackendChainName(chainId);
-
-            // Get auth token (assuming stored in localStorage or similar, or skip if public endpoint for demo)
-            // For this demo we'll use the backend endpoint which uses its own private key
-            // In a real app, user would sign with their wallet
-
-            const response = await axios.post(`${BACKEND_URL}/api/transfer/native`, {
-                to: recipient,
-                amount,
-                chain: chainName
+            sendTransaction({
+                to: recipient as `0x${string}`,
+                value: parseEther(amount),
             });
-
-            if (response.data.success) {
-                setStatus({
-                    type: 'success',
-                    message: `Transfer successful! Hash: ${response.data.txHash}`
-                });
-                setRecipient('');
-                setAmount('');
-            }
-        } catch (error: any) {
-            setStatus({
-                type: 'error',
-                message: error.response?.data?.error || 'Transfer failed'
-            });
-        } finally {
-            setLoading(false);
+        } catch (err) {
+            console.error('Transaction error:', err);
         }
     };
+
+    // Reset form on success
+    if (isSuccess && recipient) {
+        setTimeout(() => {
+            setRecipient('');
+            setAmount('');
+        }, 2000);
+    }
 
     if (!isConnected) return null;
 
@@ -58,6 +41,17 @@ export function TransferForm() {
         <div className="transfer-form-container">
             <h3>Send {symbol}</h3>
             <form onSubmit={handleSubmit} className="transfer-form">
+                <div className="form-group">
+                    <label>From</label>
+                    <input
+                        type="text"
+                        value={address || ''}
+                        disabled
+                        className="form-input"
+                        style={{ opacity: 0.7 }}
+                    />
+                </div>
+
                 <div className="form-group">
                     <label>Recipient Address</label>
                     <input
@@ -83,14 +77,32 @@ export function TransferForm() {
                     />
                 </div>
 
-                {status.message && (
-                    <div className={`status-message ${status.type}`}>
-                        {status.message}
+                {hash && (
+                    <div className="status-message success">
+                        Transaction Hash: {hash.slice(0, 10)}...{hash.slice(-8)}
                     </div>
                 )}
 
-                <button type="submit" disabled={loading} className="submit-btn">
-                    {loading ? 'Sending...' : 'Send'}
+                {isConfirming && (
+                    <div className="status-message">
+                        Waiting for confirmation...
+                    </div>
+                )}
+
+                {isSuccess && (
+                    <div className="status-message success">
+                        Transaction confirmed!
+                    </div>
+                )}
+
+                {error && (
+                    <div className="status-message error">
+                        Error: {error.message}
+                    </div>
+                )}
+
+                <button type="submit" disabled={isPending || isConfirming} className="submit-btn">
+                    {isPending || isConfirming ? 'Sending...' : 'Send'}
                 </button>
             </form>
         </div>

@@ -1,9 +1,9 @@
 import { ethers } from 'ethers';
 import config from '../config';
-import PayrollArtifact from './abis/Payroll.json';
+import SimplePayrollArtifact from './abis/SimplePayroll.json';
 
 // Extract ABI from Hardhat artifact
-const PayrollABI = (PayrollArtifact as any).abi;
+const SimplePayrollABI = (SimplePayrollArtifact as any).abi;
 
 class BlockchainService {
     private provider: ethers.JsonRpcProvider;
@@ -14,25 +14,23 @@ class BlockchainService {
         // Initialize provider
         this.provider = new ethers.JsonRpcProvider(config.rpcUrl);
 
-        // Initialize signer
-        this.signer = new ethers.Wallet(config.privateKey, this.provider);
+        // Initialize signer (use backendPrivateKey which is the deployer wallet)
+        this.signer = new ethers.Wallet(config.backendPrivateKey, this.provider);
 
         // Initialize contract
         this.payrollContract = new ethers.Contract(
             config.contractAddress,
-            PayrollABI,
+            SimplePayrollABI,
             this.signer
         );
     }
 
     // Employee Management
-    async addEmployee(wallet: string, token: string, symbol: string, salaryUSD: string) {
+    async addEmployee(wallet: string, salary: string) {
         try {
             const tx = await this.payrollContract.addEmployee(
                 wallet,
-                token,
-                symbol,
-                ethers.parseEther(salaryUSD)
+                ethers.parseEther(salary)
             );
             const receipt = await tx.wait();
             return { success: true, txHash: receipt.hash };
@@ -58,11 +56,25 @@ class BlockchainService {
                 wallet: employee.wallet,
                 token: employee.token,
                 symbol: employee.symbol,
-                salaryUSD: ethers.formatEther(employee.salaryUSD),
+                salaryUSD: ethers.formatEther(employee.salary),
                 exists: employee.exists,
             };
         } catch (error: any) {
             throw new Error(`Failed to get employee: ${error.message}`);
+        }
+    }
+
+    // Get all employees (reads addresses then fetches each record)
+    async getAllEmployees() {
+        try {
+            const addresses: string[] = await this.payrollContract.getAllEmployees();
+            const results = await Promise.all(addresses.map(async (addr) => {
+                const emp = await this.getEmployee(addr);
+                return emp;
+            }));
+            return results;
+        } catch (error: any) {
+            throw new Error(`Failed to get all employees: ${error.message}`);
         }
     }
 
@@ -87,10 +99,13 @@ class BlockchainService {
         }
     }
 
-    // Funding
+    // Funding - Send native tokens directly to contract
     async fundPayroll(amount: string) {
         try {
-            const tx = await this.payrollContract.fundPayroll(ethers.parseEther(amount));
+            const tx = await this.signer.sendTransaction({
+                to: config.contractAddress,
+                value: ethers.parseEther(amount)
+            });
             const receipt = await tx.wait();
             return { success: true, txHash: receipt.hash };
         } catch (error: any) {

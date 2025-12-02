@@ -1,24 +1,21 @@
 import { Router, Request, Response } from 'express';
+import { ethers } from 'ethers';
 import blockchainService from '../services/blockchain.service';
 import { authMiddleware } from '../middleware/auth.middleware';
 
 const router = Router();
 
 // Add employee
-router.post('/', authMiddleware, async (req: Request, res: Response) => {
+router.post('/', async (req: Request, res: Response) => {
     try {
-        const { wallet, token, symbol, salaryUSD } = req.body;
+        const { wallet, salary } = req.body;
 
         // Validation
-        if (!wallet || !token || !symbol || !salaryUSD) {
-            return res.status(400).json({ error: 'Missing required fields' });
+        if (!wallet || !salary) {
+            return res.status(400).json({ error: 'Missing required fields: wallet, salary' });
         }
 
-        if (!ethers.isAddress(wallet) || !ethers.isAddress(token)) {
-            return res.status(400).json({ error: 'Invalid address format' });
-        }
-
-        const result = await blockchainService.addEmployee(wallet, token, symbol, salaryUSD);
+        const result = await blockchainService.addEmployee(wallet, salary);
 
         res.status(201).json({
             success: true,
@@ -31,8 +28,19 @@ router.post('/', authMiddleware, async (req: Request, res: Response) => {
     }
 });
 
+// Get all employees
+router.get('/', async (req: Request, res: Response) => {
+    try {
+        const employees = await blockchainService.getAllEmployees();
+        res.json({ success: true, employees });
+    } catch (error: any) {
+        console.error('Error fetching employees list:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
+});
+
 // Get employee details
-router.get('/:address', authMiddleware, async (req: Request, res: Response) => {
+router.get('/:address', async (req: Request, res: Response) => {
     try {
         const { address } = req.params;
 
@@ -53,7 +61,7 @@ router.get('/:address', authMiddleware, async (req: Request, res: Response) => {
 });
 
 // Remove employee
-router.delete('/:address', authMiddleware, async (req: Request, res: Response) => {
+router.delete('/:address', async (req: Request, res: Response) => {
     try {
         const { address } = req.params;
 

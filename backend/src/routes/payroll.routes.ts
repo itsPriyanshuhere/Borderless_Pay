@@ -6,7 +6,7 @@ import { authMiddleware } from '../middleware/auth.middleware';
 const router = Router();
 
 // Fund payroll contract
-router.post('/fund', authMiddleware, async (req: Request, res: Response) => {
+router.post('/fund', async (req: Request, res: Response) => {
     try {
         const { amount } = req.body;
 
@@ -28,7 +28,7 @@ router.post('/fund', authMiddleware, async (req: Request, res: Response) => {
 });
 
 // Get payroll balance
-router.get('/balance', authMiddleware, async (req: Request, res: Response) => {
+router.get('/balance', async (req: Request, res: Response) => {
     try {
         const balance = await blockchainService.getBalance();
 
@@ -43,7 +43,7 @@ router.get('/balance', authMiddleware, async (req: Request, res: Response) => {
 });
 
 // Pay single employee
-router.post('/execute/:address', authMiddleware, async (req: Request, res: Response) => {
+router.post('/execute/:address', async (req: Request, res: Response) => {
     try {
         const { address } = req.params;
 
@@ -65,7 +65,7 @@ router.post('/execute/:address', authMiddleware, async (req: Request, res: Respo
 });
 
 // Pay all employees (batch payment)
-router.post('/execute', authMiddleware, async (req: Request, res: Response) => {
+router.post('/execute', async (req: Request, res: Response) => {
     try {
         const { employeeAddresses } = req.body;
 

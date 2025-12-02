@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { BACKEND_URL } from '../config/wagmi';
 
@@ -7,6 +7,26 @@ function Payroll() {
     const [employeeAddress, setEmployeeAddress] = useState('');
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+    const [employees, setEmployees] = useState<Array<{ wallet: string; salaryUSD?: string }>>([]);
+    const [contractBalance, setContractBalance] = useState<string | null>(null);
+
+    useEffect(() => {
+        fetchMetadata();
+    }, []);
+
+    const fetchMetadata = async () => {
+        try {
+            const [empRes, balRes] = await Promise.all([
+                axios.get(`${BACKEND_URL}/api/employees`),
+                axios.get(`${BACKEND_URL}/api/payroll/balance`),
+            ]);
+
+            if (empRes.data?.success) setEmployees(empRes.data.employees || []);
+            if (balRes.data?.success) setContractBalance(balRes.data.balance || null);
+        } catch (err) {
+            console.warn('Failed to fetch payroll metadata', err);
+        }
+    };
 
     const handleFund = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -19,6 +39,7 @@ function Payroll() {
             if (res.data.success) {
                 setMessage({ type: 'success', text: `Funded! Tx: ${res.data.txHash}` });
                 setFundAmount('');
+                await fetchMetadata();
             }
         } catch (error: any) {
             setMessage({
@@ -41,6 +62,7 @@ function Payroll() {
             if (res.data.success) {
                 setMessage({ type: 'success', text: `Employee paid! Tx: ${res.data.txHash}` });
                 setEmployeeAddress('');
+                await fetchMetadata();
             }
         } catch (error: any) {
             setMessage({
@@ -57,8 +79,7 @@ function Payroll() {
         setMessage(null);
 
         try {
-            // In real implementation, fetch employee addresses from contract or backend
-            const employeeAddresses: string[] = []; // Replace with actual addresses
+            const employeeAddresses: string[] = employees.map(e => e.wallet);
 
             if (employeeAddresses.length === 0) {
                 setMessage({ type: 'error', text: 'No employees to pay' });
@@ -73,6 +94,7 @@ function Payroll() {
                     type: 'success',
                     text: `Batch payment successful! ${res.data.employeeCount} employees paid. Tx: ${res.data.txHash}`
                 });
+                await fetchMetadata();
             }
         } catch (error: any) {
             setMessage({

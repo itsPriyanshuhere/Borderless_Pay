@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { BACKEND_URL } from '../config/wagmi';
 
@@ -12,29 +12,57 @@ interface Employee {
 function Employees() {
     const [formData, setFormData] = useState({
         wallet: '',
-        token: '',
-        symbol: 'BTC',
         salaryUSD: '',
     });
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+    const [employees, setEmployees] = useState<Array<{ wallet: string; salaryUSD: string; exists?: boolean }>>([]);
+
+    useEffect(() => {
+        fetchEmployees();
+    }, []);
+
+    const fetchEmployees = async () => {
+        try {
+            const res = await axios.get(`${BACKEND_URL}/api/employees`);
+            if (res.data.success) setEmployees(res.data.employees || []);
+        } catch (err) {
+            console.warn('Failed to fetch employees list', err);
+        }
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
         setMessage(null);
+        // Basic address validation (simple check)
+        const addr = formData.wallet?.trim();
+        const isAddress = /^0x[a-fA-F0-9]{40}$/.test(addr);
+        if (!isAddress) {
+            setMessage({ type: 'error', text: 'Invalid wallet address format' });
+            setLoading(false);
+            return;
+        }
 
         try {
-            const res = await axios.post(`${BACKEND_URL}/api/employees`, formData);
+            // Backend expects `wallet` and `salary` (salary as string).
+            const payload = {
+                wallet: addr,
+                salary: formData.salaryUSD,
+            } as Record<string, any>;
+            const res = await axios.post(`${BACKEND_URL}/api/employees`, payload);
 
             if (res.data.success) {
                 setMessage({ type: 'success', text: `Employee added! Tx: ${res.data.txHash}` });
-                setFormData({ wallet: '', token: '', symbol: 'BTC', salaryUSD: '' });
+                setFormData({ wallet: '', salaryUSD: '' });
+                await fetchEmployees();
+            } else {
+                setMessage({ type: 'error', text: res.data.error || 'Failed to add employee' });
             }
         } catch (error: any) {
             setMessage({
                 type: 'error',
-                text: error.response?.data?.error || 'Failed to add employee'
+                text: error.response?.data?.error || error.message || 'Failed to add employee'
             });
         } finally {
             setLoading(false);
@@ -61,35 +89,6 @@ function Employees() {
                         />
                     </div>
 
-                    <div className="form-group">
-                        <label htmlFor="token">Token Address</label>
-                        <input
-                            id="token"
-                            type="text"
-                            placeholder="0x..."
-                            value={formData.token}
-                            onChange={(e) => setFormData({ ...formData, token: e.target.value })}
-                            required
-                        />
-                    </div>
-
-                    <div className="form-group">
-                        <label htmlFor="symbol">Token Symbol</label>
-                        <select
-                            id="symbol"
-                            value={formData.symbol}
-                            onChange={(e) => setFormData({ ...formData, symbol: e.target.value })}
-                            required
-                        >
-                            <option value="BTC">BTC - Bitcoin</option>
-                            <option value="ETH">ETH - Ethereum</option>
-                            <option value="XRP">XRP - Ripple</option>
-                            <option value="SOL">SOL - Solana</option>
-                            <option value="QIE">QIE - QIE Token</option>
-                            <option value="XAUt">XAUt - Tether Gold</option>
-                            <option value="BNB">BNB - Binance Coin</option>
-                        </select>
-                    </div>
 
                     <div className="form-group">
                         <label htmlFor="salaryUSD">Monthly Salary (USD)</label>
@@ -118,8 +117,26 @@ function Employees() {
 
             <div className="employee-list-card">
                 <h3>Employee List</h3>
-                <p className="info">Connect to backend to view employees</p>
-                {/* Employee list would be populated here from contract events or backend API */}
+                {employees.length === 0 ? (
+                    <p className="info">No employees registered yet.</p>
+                ) : (
+                    <table className="employee-table">
+                        <thead>
+                            <tr>
+                                <th>Wallet</th>
+                                <th>Salary (USD)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {employees.map((emp) => (
+                                <tr key={emp.wallet}>
+                                    <td>{emp.wallet}</td>
+                                    <td>{parseFloat(emp.salaryUSD || '0').toLocaleString()}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                )}
             </div>
         </div>
     );

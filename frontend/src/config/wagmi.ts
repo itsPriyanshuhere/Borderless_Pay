@@ -17,7 +17,7 @@ export const config = getDefaultConfig({
 });
 
 // Backend API base URL (Vite exposes VITE_* env vars on import.meta.env)
-export const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || import.meta.env.REACT_APP_API_URL || 'http://localhost:4000';
+export const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || import.meta.env.REACT_APP_API_URL || 'http://localhost:3001';
 
 // Expose rpc urls for other modules if needed
 export const VITE_QIE_RPC_URL = import.meta.env.VITE_QIE_RPC_URL || import.meta.env.REACT_APP_QIE_RPC_URL || 'https://rpc1testnet.qie.digital/';
