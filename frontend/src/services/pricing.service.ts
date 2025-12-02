@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const COINGECKO_API = 'https://api.coingecko.com/api/v3/simple/price';
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const CACHE_DURATION = 5 * 60 * 1000;
 
 interface PriceCache {
     [key: string]: {
@@ -12,11 +12,10 @@ interface PriceCache {
 
 const priceCache: PriceCache = {};
 
-// Map symbols to CoinGecko IDs
 const TOKEN_MAP: Record<string, string> = {
-    'QIE': 'qie-blockchain', // Verify this ID
+    'QIE': 'qie-blockchain', 
     'ETH': 'ethereum',
-    'SEP': 'ethereum', // Use ETH price for Sepolia ETH
+    'SEP': 'ethereum', 
     'BTC': 'bitcoin',
     'USDT': 'tether',
 };
@@ -25,7 +24,6 @@ export const getPrice = async (symbol: string): Promise<number | null> => {
     const coinId = TOKEN_MAP[symbol.toUpperCase()];
     if (!coinId) return null;
 
-    // Check cache
     const cached = priceCache[symbol];
     if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
         return cached.price;
