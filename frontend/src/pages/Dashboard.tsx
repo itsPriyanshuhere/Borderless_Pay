@@ -12,6 +12,7 @@ function Dashboard() {
     const [prices, setPrices] = useState<Record<string, string>>({});
     const [loading, setLoading] = useState(false);
     const [networkSymbol, setNetworkSymbol] = useState('ETH');
+    const [employeeCount, setEmployeeCount] = useState<number>(0);
 
     useEffect(() => {
         if (isConnected && chainId) {
@@ -24,6 +25,7 @@ function Dashboard() {
     const fetchDashboardData = async () => {
         setLoading(true);
         try {
+            // Fetch balance from backend for the current chain
             if (address && chainId) {
                 const chainName = getBackendChainName(chainId);
                 try {
@@ -36,6 +38,17 @@ function Dashboard() {
                 }
             }
 
+            // Fetch employee count
+            try {
+                const empRes = await axios.get(`${BACKEND_URL}/api/employees`);
+                if (empRes.data?.success) {
+                    setEmployeeCount(empRes.data.employees?.length || 0);
+                }
+            } catch (err) {
+                console.error('Failed to fetch employees:', err);
+            }
+
+            // Fetch live prices
             const symbols = ['QIE', 'ETH', 'BTC', 'USDT'];
             const newPrices: Record<string, string> = {};
 
@@ -55,6 +68,17 @@ function Dashboard() {
             setLoading(false);
         }
     };
+
+    if (!isConnected) {
+        return (
+            <div className="dashboard-empty">
+                <div className="empty-state">
+                    <h2>Connect Wallet</h2>
+                    <p>Please connect your wallet to view your dashboard and manage assets.</p>
+                </div>
+            </div>
+        );
+    }
 
     if (loading && !balance) {
         return <div className="loading">Loading dashboard...</div>;
@@ -77,7 +101,7 @@ function Dashboard() {
                     <div className="stat-icon">👥</div>
                     <div className="stat-content">
                         <h3>Active Employees</h3>
-                        <p className="stat-value">12</p>
+                        <p className="stat-value">{employeeCount}</p>
                         <span className="stat-label">Total Registered</span>
                     </div>
                 </div>

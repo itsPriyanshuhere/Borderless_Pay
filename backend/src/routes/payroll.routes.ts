@@ -80,7 +80,7 @@ router.post('/execute', async (req: Request, res: Response) => {
             }
         }
 
-        const result = await blockchainService.payAllEmployees(employeeAddresses);
+        const result = await blockchainService.payAllEmployees();
 
         res.json({
             success: true,

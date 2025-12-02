@@ -4,7 +4,7 @@ import { parseEther } from 'viem';
 import { getNetwork } from '../config/networks';
 
 export function TransferForm() {
-    const { isConnected, chainId, address } = useAccount();
+    const { isConnected, chainId } = useAccount();
     const [recipient, setRecipient] = useState('');
     const [amount, setAmount] = useState('');
     const { sendTransaction, data: hash, isPending, error } = useSendTransaction();
@@ -38,43 +38,32 @@ export function TransferForm() {
     const symbol = network?.nativeCurrency.symbol || 'ETH';
 
     return (
-        <div className="transfer-form-container">
-            <h3>Send {symbol}</h3>
+        <div className="transfer-form-wrapper">
             <form onSubmit={handleSubmit} className="transfer-form">
-                <div className="form-group">
-                    <label>From</label>
-                    <input
-                        type="text"
-                        value={address || ''}
-                        disabled
-                        className="form-input"
-                        style={{ opacity: 0.7 }}
-                    />
-                </div>
-
-                <div className="form-group">
-                    <label>Recipient Address</label>
-                    <input
-                        type="text"
-                        value={recipient}
-                        onChange={(e) => setRecipient(e.target.value)}
-                        placeholder="0x..."
-                        required
-                        className="form-input"
-                    />
-                </div>
-
-                <div className="form-group">
-                    <label>Amount ({symbol})</label>
-                    <input
-                        type="number"
-                        step="0.000001"
-                        value={amount}
-                        onChange={(e) => setAmount(e.target.value)}
-                        placeholder="0.0"
-                        required
-                        className="form-input"
-                    />
+                <div className="form-row">
+                    <div className="form-group">
+                        <label>Recipient Address</label>
+                        <input
+                            type="text"
+                            value={recipient}
+                            onChange={(e) => setRecipient(e.target.value)}
+                            placeholder="0x..."
+                            required
+                            className="glass-input"
+                        />
+                    </div>
+                    <div className="form-group">
+                        <label>Amount ({symbol})</label>
+                        <input
+                            type="number"
+                            step="0.000001"
+                            value={amount}
+                            onChange={(e) => setAmount(e.target.value)}
+                            placeholder="0.0"
+                            required
+                            className="glass-input"
+                        />
+                    </div>
                 </div>
 
                 {hash && (
@@ -101,10 +90,37 @@ export function TransferForm() {
                     </div>
                 )}
 
-                <button type="submit" disabled={isPending || isConfirming} className="submit-btn">
-                    {isPending || isConfirming ? 'Sending...' : 'Send'}
+                <button type="submit" disabled={isPending || isConfirming} className="btn-primary full-width">
+                    {isPending || isConfirming ? 'Sending...' : `Send ${symbol}`}
                 </button>
             </form>
+
+            <style>{`
+                .transfer-form-wrapper {
+                    width: 100%;
+                }
+
+                .form-row {
+                    display: grid;
+                    grid-template-columns: 2fr 1fr;
+                    gap: 1.5rem;
+                    margin-bottom: 1.5rem;
+                }
+
+
+
+                .full-width {
+                    width: 100%;
+                    padding: 1rem;
+                    font-size: 1.1rem;
+                }
+
+                @media (max-width: 768px) {
+                    .form-row {
+                        grid-template-columns: 1fr;
+                    }
+                }
+            `}</style>
         </div>
     );
 }

@@ -28,7 +28,6 @@ function Employees() {
         e.preventDefault();
         setLoading(true);
         setMessage(null);
-        // Basic address validation (simple check)
         const addr = formData.wallet?.trim();
         const isAddress = /^0x[a-fA-F0-9]{40}$/.test(addr);
         if (!isAddress) {
@@ -38,7 +37,6 @@ function Employees() {
         }
 
         try {
-            // Backend expects `wallet` and `salary` (salary as string).
             const payload = {
                 wallet: addr,
                 salary: formData.salaryUSD,
@@ -64,73 +62,184 @@ function Employees() {
 
     return (
         <div className="employees-page">
-            <h2>Employee Management</h2>
+            <div className="page-header">
+                <h2>Employee Management</h2>
+                <p className="text-muted">Manage your team and their salaries</p>
+            </div>
 
-            <div className="employee-form-card">
-                <h3>Add New Employee</h3>
+            <div className="employees-grid">
+                {/* Add Employee Form */}
+                <div className="glass-card form-section">
+                    <h3>Add New Employee</h3>
+                    <form onSubmit={handleSubmit} className="employee-form">
+                        <div className="form-group">
+                            <label htmlFor="wallet">Wallet Address</label>
+                            <input
+                                id="wallet"
+                                type="text"
+                                placeholder="0x..."
+                                value={formData.wallet}
+                                onChange={(e) => setFormData({ ...formData, wallet: e.target.value })}
+                                required
+                                className="glass-input"
+                            />
+                        </div>
 
-                <form onSubmit={handleSubmit} className="employee-form">
-                    <div className="form-group">
-                        <label htmlFor="wallet">Employee Wallet Address</label>
-                        <input
-                            id="wallet"
-                            type="text"
-                            placeholder="0x..."
-                            value={formData.wallet}
-                            onChange={(e) => setFormData({ ...formData, wallet: e.target.value })}
-                            required
-                        />
+                        <div className="form-group">
+                            <label htmlFor="salaryUSD">Monthly Salary (USD)</label>
+                            <input
+                                id="salaryUSD"
+                                type="number"
+                                placeholder="5000"
+                                step="0.01"
+                                value={formData.salaryUSD}
+                                onChange={(e) => setFormData({ ...formData, salaryUSD: e.target.value })}
+                                required
+                                className="glass-input"
+                            />
+                        </div>
+
+                        {message && (
+                            <div className={`message ${message.type}`}>
+                                {message.text}
+                            </div>
+                        )}
+
+                        <button type="submit" className="btn-primary full-width" disabled={loading}>
+                            {loading ? 'Adding...' : '➕ Add Employee'}
+                        </button>
+                    </form>
+                </div>
+
+                {/* Employee List */}
+                <div className="glass-card list-section">
+                    <div className="list-header">
+                        <h3>Team Members</h3>
+                        <span className="badge">{employees.length} Active</span>
                     </div>
 
-
-                    <div className="form-group">
-                        <label htmlFor="salaryUSD">Monthly Salary (USD)</label>
-                        <input
-                            id="salaryUSD"
-                            type="number"
-                            placeholder="5000"
-                            step="0.01"
-                            value={formData.salaryUSD}
-                            onChange={(e) => setFormData({ ...formData, salaryUSD: e.target.value })}
-                            required
-                        />
-                    </div>
-
-                    {message && (
-                        <div className={`message ${message.type}`}>
-                            {message.text}
+                    {employees.length === 0 ? (
+                        <div className="empty-state">
+                            <div className="icon">👥</div>
+                            <p>No employees registered yet.</p>
+                        </div>
+                    ) : (
+                        <div className="table-container">
+                            <table className="glass-table">
+                                <thead>
+                                    <tr>
+                                        <th>Wallet</th>
+                                        <th>Salary (USD)</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {employees.map((emp) => (
+                                        <tr key={emp.wallet}>
+                                            <td className="font-mono">{emp.wallet.slice(0, 6)}...{emp.wallet.slice(-4)}</td>
+                                            <td className="text-glow">${parseFloat(emp.salaryUSD || '0').toLocaleString()}</td>
+                                            <td><span className="status-badge active">Active</span></td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
                         </div>
                     )}
-
-                    <button type="submit" className="submit-btn" disabled={loading}>
-                        {loading ? 'Adding Employee...' : '➕ Add Employee'}
-                    </button>
-                </form>
+                </div>
             </div>
 
-            <div className="employee-list-card">
-                <h3>Employee List</h3>
-                {employees.length === 0 ? (
-                    <p className="info">No employees registered yet.</p>
-                ) : (
-                    <table className="employee-table">
-                        <thead>
-                            <tr>
-                                <th>Wallet</th>
-                                <th>Salary (USD)</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {employees.map((emp) => (
-                                <tr key={emp.wallet}>
-                                    <td>{emp.wallet}</td>
-                                    <td>{parseFloat(emp.salaryUSD || '0').toLocaleString()}</td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                )}
-            </div>
+            <style>{`
+                .employees-page {
+                    display: flex;
+                    flex-direction: column;
+                    gap: 2rem;
+                }
+
+                .employees-grid {
+                    display: grid;
+                    grid-template-columns: 1fr 2fr;
+                    gap: 2rem;
+                }
+
+                .form-section, .list-section {
+                    padding: 2rem;
+                }
+
+
+
+                .list-header {
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    margin-bottom: 1.5rem;
+                }
+
+                .badge {
+                    background: rgba(45, 106, 255, 0.1);
+                    color: var(--neon-blue);
+                    padding: 0.25rem 0.75rem;
+                    border-radius: 20px;
+                    font-size: 0.85rem;
+                    font-weight: 600;
+                }
+
+                .glass-table {
+                    width: 100%;
+                    border-collapse: collapse;
+                }
+
+                .glass-table th {
+                    text-align: left;
+                    padding: 1rem;
+                    color: var(--text-muted);
+                    font-weight: 500;
+                    border-bottom: 1px solid var(--border-glass);
+                }
+
+                .glass-table td {
+                    padding: 1rem;
+                    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+                }
+
+                .glass-table tr:hover td {
+                    background: rgba(255, 255, 255, 0.02);
+                }
+
+                .font-mono {
+                    font-family: 'Fira Code', monospace;
+                    color: var(--text-secondary);
+                }
+
+                .status-badge {
+                    padding: 0.25rem 0.75rem;
+                    border-radius: 20px;
+                    font-size: 0.8rem;
+                    font-weight: 600;
+                }
+
+                .status-badge.active {
+                    background: rgba(10, 255, 96, 0.1);
+                    color: var(--neon-green);
+                }
+
+                .empty-state {
+                    text-align: center;
+                    padding: 3rem;
+                    color: var(--text-muted);
+                }
+
+                .empty-state .icon {
+                    font-size: 3rem;
+                    margin-bottom: 1rem;
+                    opacity: 0.5;
+                }
+
+                @media (max-width: 1024px) {
+                    .employees-grid {
+                        grid-template-columns: 1fr;
+                    }
+                }
+            `}</style>
         </div>
     );
 }

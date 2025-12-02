@@ -33,6 +33,7 @@ class BlockchainService {
                 ethers.parseEther(salary)
             );
             const receipt = await tx.wait();
+            if (!receipt) throw new Error('Transaction failed');
             return { success: true, txHash: receipt.hash };
         } catch (error: any) {
             throw new Error(`Failed to add employee: ${error.message}`);
@@ -43,6 +44,7 @@ class BlockchainService {
         try {
             const tx = await this.payrollContract.removeEmployee(wallet);
             const receipt = await tx.wait();
+            if (!receipt) throw new Error('Transaction failed');
             return { success: true, txHash: receipt.hash };
         } catch (error: any) {
             throw new Error(`Failed to remove employee: ${error.message}`);
@@ -83,16 +85,18 @@ class BlockchainService {
         try {
             const tx = await this.payrollContract.payEmployee(employeeAddress);
             const receipt = await tx.wait();
+            if (!receipt) throw new Error('Transaction failed');
             return { success: true, txHash: receipt.hash };
         } catch (error: any) {
             throw new Error(`Failed to pay employee: ${error.message}`);
         }
     }
 
-    async payAllEmployees(employeeAddresses: string[]) {
+    async payAllEmployees() {
         try {
-            const tx = await this.payrollContract.payAllEmployees(employeeAddresses);
+            const tx = await this.payrollContract.payAllEmployees({ gasLimit: 500000 });
             const receipt = await tx.wait();
+            if (!receipt) throw new Error('Transaction failed');
             return { success: true, txHash: receipt.hash };
         } catch (error: any) {
             throw new Error(`Failed to execute batch payment: ${error.message}`);
@@ -107,6 +111,7 @@ class BlockchainService {
                 value: ethers.parseEther(amount)
             });
             const receipt = await tx.wait();
+            if (!receipt) throw new Error('Transaction failed');
             return { success: true, txHash: receipt.hash };
         } catch (error: any) {
             throw new Error(`Failed to fund payroll: ${error.message}`);
@@ -136,6 +141,7 @@ class BlockchainService {
         try {
             const tx = await this.payrollContract.addOracle(symbol, oracleAddress);
             const receipt = await tx.wait();
+            if (!receipt) throw new Error('Transaction failed');
             return { success: true, txHash: receipt.hash };
         } catch (error: any) {
             throw new Error(`Failed to add oracle: ${error.message}`);
