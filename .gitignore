@@ -1,0 +1,37 @@
+.env
+node_modules/
+dist/
+cache/
+artifacts/
+typechain-types/
+coverage/
+coverage.json
+gas-report.txt
+*.log
+
+# Hardhat
+.openzeppelin/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+## Env files (local, secrets)
+# Individual service envs
+backend/.env
+frontend/.env
+frontend/.env.local
+# Vite / Create React App local envs
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+# Generic patterns (keep .env.example)
+.env
+!.env.example
