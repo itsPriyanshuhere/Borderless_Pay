@@ -2,13 +2,6 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { BACKEND_URL } from '../config/wagmi';
 
-interface Employee {
-    wallet: string;
-    token: string;
-    symbol: string;
-    salaryUSD: string;
-}
-
 function Employees() {
     const [formData, setFormData] = useState({
         wallet: '',

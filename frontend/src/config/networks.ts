@@ -8,7 +8,7 @@ const VITE_QIE_RPC = (import.meta.env.VITE_QIE_RPC_URL as string) || (import.met
 export const qieTestnet = {
     id: QIE_TESTNET_ID,
     name: 'QIE Testnet',
-    network: 'qie-testnet',
+
     nativeCurrency: {
         decimals: 18,
         name: 'QIE',

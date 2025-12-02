@@ -1,11 +1,12 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { useAccount } from 'wagmi';
+import Landing from './pages/Landing';
 import Dashboard from './pages/Dashboard';
 import Employees from './pages/Employees';
 import Payroll from './pages/Payroll';
 import History from './pages/History';
-import Navigation from './components/Navigation';
+import Sidebar from './components/Sidebar';
+import { ConnectButton } from '@rainbow-me/rainbowkit';
 
 function App() {
     const { isConnected } = useAccount();
@@ -13,56 +14,85 @@ function App() {
     return (
         <Router>
             <div className="app">
-                <header className="header">
-                    <div className="header-content">
-                        <div className="logo">
-                            <h1>💼 Crypto Payroll</h1>
-                            <span className="subtitle">On-Chain Payment System</span>
-                        </div>
-                        <ConnectButton />
-                    </div>
-                </header>
+                <Routes>
+                    <Route path="/" element={<Landing />} />
 
-                {isConnected ? (
-                    <div className="main-layout">
-                        <Navigation />
-                        <main className="content">
-                            <Routes>
-                                <Route path="/" element={<Dashboard />} />
-                                <Route path="/employees" element={<Employees />} />
-                                <Route path="/payroll" element={<Payroll />} />
-                                <Route path="/history" element={<History />} />
-                                <Route path="*" element={<Navigate to="/" replace />} />
-                            </Routes>
-                        </main>
-                    </div>
-                ) : (
-                    <div className="welcome-screen">
-                        <div className="welcome-content">
-                            <h2>Welcome to Crypto Payroll</h2>
-                            <p>Pay your employees in any cryptocurrency with real-time oracle pricing</p>
-                            <div className="features">
-                                <div className="feature">
-                                    <span className="feature-icon">🌐</span>
-                                    <h3>Multi-Token Support</h3>
-                                    <p>BTC, ETH, SOL, XRP, QIE, and more</p>
+                    {/* Protected Routes */}
+                    <Route
+                        path="/*"
+                        element={
+                            isConnected ? (
+                                <div className="main-layout">
+                                    <Sidebar />
+                                    <div className="app-content">
+                                        <header className="dashboard-header glass-card">
+                                            <div className="header-title">
+                                                <h2>QIE Payroll</h2>
+                                                <span className="subtitle">Dashboard</span>
+                                            </div>
+                                            <ConnectButton />
+                                        </header>
+                                        <main className="content-area">
+                                            <Routes>
+                                                <Route path="/dashboard" element={<Dashboard />} />
+                                                <Route path="/employees" element={<Employees />} />
+                                                <Route path="/payroll" element={<Payroll />} />
+                                                <Route path="/history" element={<History />} />
+                                                <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                                            </Routes>
+                                        </main>
+                                    </div>
                                 </div>
-                                <div className="feature">
-                                    <span className="feature-icon">📊</span>
-                                    <h3>Real-Time Pricing</h3>
-                                    <p>Powered by QIE Oracle Network</p>
-                                </div>
-                                <div className="feature">
-                                    <span className="feature-icon">⚡</span>
-                                    <h3>Instant Swaps</h3>
-                                    <p>Automated DEX integration</p>
-                                </div>
-                            </div>
-                            <p className="cta">Connect your wallet to get started</p>
-                        </div>
-                    </div>
-                )}
+                            ) : (
+                                <Navigate to="/" replace />
+                            )
+                        }
+                    />
+                </Routes>
             </div>
+            <style>{`
+                .app-content {
+                    flex: 1;
+                    display: flex;
+                    flex-direction: column;
+                    min-height: 100vh;
+                    margin-left: 260px; /* Sidebar width */
+                }
+
+                .dashboard-header {
+                    position: sticky;
+                    top: 1rem;
+                    margin: 1rem 2rem;
+                    padding: 1rem 2rem;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                    z-index: 50;
+                }
+
+                .content-area {
+                    padding: 0 2rem 2rem;
+                }
+
+                .header-title h2 {
+                    font-size: 1.5rem;
+                    margin: 0;
+                    background: var(--gradient-main);
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                    background-clip: text;
+                }
+
+                @media (max-width: 768px) {
+                    .app-content {
+                        margin-left: 0;
+                        padding-bottom: 80px; /* Bottom nav space */
+                    }
+                    .dashboard-header {
+                        margin: 1rem;
+                    }
+                }
+            `}</style>
         </Router>
     );
 }

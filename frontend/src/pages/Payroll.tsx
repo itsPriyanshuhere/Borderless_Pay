@@ -8,7 +8,7 @@ function Payroll() {
     const [loading, setLoading] = useState(false);
     const [message, setMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
     const [employees, setEmployees] = useState<Array<{ wallet: string; salaryUSD?: string }>>([]);
-    const [contractBalance, setContractBalance] = useState<string | null>(null);
+
 
     useEffect(() => {
         fetchMetadata();
@@ -16,13 +16,13 @@ function Payroll() {
 
     const fetchMetadata = async () => {
         try {
-            const [empRes, balRes] = await Promise.all([
+            const [empRes] = await Promise.all([
                 axios.get(`${BACKEND_URL}/api/employees`),
                 axios.get(`${BACKEND_URL}/api/payroll/balance`),
             ]);
 
             if (empRes.data?.success) setEmployees(empRes.data.employees || []);
-            if (balRes.data?.success) setContractBalance(balRes.data.balance || null);
+
         } catch (err) {
             console.warn('Failed to fetch payroll metadata', err);
         }
