@@ -1,52 +1,47 @@
-# 💼 Crypto Payroll System
+# Crypto Payroll System
 
-A fully on-chain, automated cryptocurrency payroll system built for the QIE Blockchain Hackathon. Pay employees in any supported cryptocurrency using real-time oracle price feeds and automated DEX swaps.
+A fully on-chain, automated cryptocurrency payroll system built for the QIE Blockchain. Pay employees in native tokens using smart contracts with real-time transaction history and employee management.
 
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Solidity](https://img.shields.io/badge/Solidity-^0.8.25-363636.svg)
 ![Node](https://img.shields.io/badge/Node-20+-339933.svg)
 ![React](https://img.shields.io/badge/React-18-61DAFB.svg)
 
-## ✨ Features
+## Features
 
-- **Multi-Chain Support**: QIE Testnet (Primary) and ETH Sepolia (Testing)
-- **Multi-Token Support**: Pay employees in BTC, ETH, SOL, XRP, QIE, XAUt, BNB
-- **Real-Time Pricing**: Powered by QIE Oracle Network (Chainlink-compatible)
-- **Automated Swaps**: DEX integration for seamless token conversion
-- **Batch Payments**: Pay all employees in a single transaction
-- **Wallet Authentication**: Secure Web3 wallet-based login
-- **Scheduled Payroll**: Automated monthly/bi-weekly payroll execution
-- **Modern UI**: Premium dark theme with glassmorphism and animations
+- **Native Token Payments**: Pay employees directly in QIE or ETH
+- **Employee Management**: Add, remove, and track employee information
+- **Batch Payments**: Pay all employees in a single transaction with gas optimization
+- **Balance Checking**: Automatic validation of contract funds before payroll execution
+- **Transaction History**: Complete record of all funding and payment transactions
+- **Wallet Authentication**: Secure Web3 wallet-based access
+- **Modern UI**: Clean, professional interface with glassmorphism design
+- **Fully Responsive**: Works seamlessly on desktop and mobile devices
 
-## 🏗️ Architecture
+## Architecture
 
 ### Smart Contracts (Solidity)
-- `Payroll.sol` - Main payroll contract with employee management and payment logic
-- `ISwapRouter.sol` - Uniswap V3 DEX integration interface
-- `IERC20.sol` - Standard ERC20 token interface
+- `SimplePayroll.sol` - Main payroll contract with employee management and native token payment logic
 
 ### Backend (Node.js + TypeScript)
 - Express REST API for payroll operations
 - Ethers.js v6 for blockchain interaction
-- JWT + wallet signature authentication
-- Cron-based automated scheduling
-- Real-time event listening
+- Event querying for transaction history
+- Real-time contract interaction
 
 ### Frontend (React + TypeScript)
 - Vite for fast development and builds
 - Wagmi + RainbowKit for wallet connection
 - TanStack Query for data fetching
-- Premium dark theme with modern aesthetics
+- Modern dark theme with clean aesthetics
 - Fully responsive design
 
-## 📦 Project Structure
+## Project Structure
 
 ```
 webWallet/
 ├── contracts/              # Smart contracts
-│   ├── Payroll.sol
-│   ├── ISwapRouter.sol
-│   └── IERC20.sol
+│   └── SimplePayroll.sol
 ├── backend/                # Backend API
 │   ├── src/
 │   │   ├── config/
@@ -64,11 +59,10 @@ webWallet/
 │   │   └── main.tsx
 │   └── package.json
 ├── scripts/                # Deployment scripts
-├── test/                   # Contract tests
 └── hardhat.config.ts       # Hardhat configuration
 ```
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 - Node.js 20+
@@ -96,28 +90,13 @@ npm install
 
 ### 2. Configure Environment Variables
 
-**Root `.env`:**
-```env
-RPC_URL=https://your-rpc-endpoint
-CHAIN_ID=1
-PRIVATE_KEY=your_private_key
-DEX_ROUTER_ADDRESS=0x...
-FALLBACK_TOKEN_ADDRESS=0x...
-```
-
 **Backend `.env`:**
 ```env
 PORT=3001
 NODE_ENV=development
-# RPC URLs
 QIE_RPC_URL=https://rpc1testnet.qie.digital/
-SEPOLIA_RPC_URL=https://eth-sepolia.g.alchemy.com/v2/your-api-key
-# Private Key for Backend Signing
-BACKEND_PRIVATE_KEY=your_private_key_here
-# Legacy/Contract Config
-CONTRACT_ADDRESS=0x...
-PRIVATE_KEY=your_private_key
-JWT_SECRET=your_secret
+BACKEND_PRIVATE_KEY=your_deployer_private_key
+CONTRACT_ADDRESS=0x_your_deployed_contract_address
 ```
 
 **Frontend `.env`:**
@@ -129,13 +108,10 @@ VITE_BACKEND_URL=http://localhost:3001
 
 ```bash
 # Compile contracts
-npm run compile
+npx hardhat compile
 
-# Run tests
-npm test
-
-# Deploy to network
-npm run deploy:testnet
+# Deploy to QIE testnet
+npx hardhat run scripts/deploySimple.ts --network qie_testnet
 ```
 
 ### 4. Start Backend
@@ -154,9 +130,9 @@ cd frontend
 npm run dev
 ```
 
-The app will be available at `http://localhost:3000`
+The app will be available at `http://localhost:5173`
 
-## 📖 Usage
+## Usage
 
 ### Adding an Employee
 
@@ -164,17 +140,15 @@ The app will be available at `http://localhost:3000`
 2. Navigate to **Employees** page
 3. Fill in:
    - Employee wallet address
-   - Preferred token address
-   - Token symbol (BTC, ETH, etc.)
-   - Monthly salary in USD
+   - Monthly salary (in native tokens)
 4. Click "Add Employee"
 
 ### Funding Payroll
 
-1. Go to **Payroll** page
-2. Enter USDT amount to fund
+1. Go to **Run Payroll** page
+2. Enter amount to fund (in native tokens)
 3. Approve transaction in wallet
-4. Contract receives fallback tokens for swaps
+4. Contract receives funds for employee payments
 
 ### Executing Payroll
 
@@ -183,82 +157,90 @@ The app will be available at `http://localhost:3000`
 - Click "Pay Employee"
 
 **Batch Payment:**
-- Click "Execute Payroll"
+- Click "Execute All Payments"
 - All registered employees get paid in one transaction
+- Balance check ensures sufficient funds before execution
 
-## 🔧 API Endpoints
+### Viewing History
+
+1. Navigate to **History** page
+2. View all transactions (funding and payments)
+3. Filter by type (All/Payouts/Funding)
+4. Click transaction hashes to view on blockchain explorer
+
+## API Endpoints
 
 ```
-POST   /api/auth/login          - Wallet authentication
-GET    /api/auth/network        - Network info
-
+GET    /api/employees           - Get all employees
 POST   /api/employees           - Add employee
-GET    /api/employees/:address  - Get employee details
 DELETE /api/employees/:address  - Remove employee
 
 POST   /api/payroll/fund        - Fund contract
-GET    /api/payroll/balance     - Get balance
-POST   /api/payroll/execute     - Batch payment
+GET    /api/payroll/balance     - Get contract balance
+POST   /api/payroll/execute     - Execute batch payment
 POST   /api/payroll/execute/:address - Pay single employee
 
-GET    /api/oracle/price/:symbol - Get token price
-GET    /api/oracle/prices       - Get all prices
-POST   /api/oracle/add          - Add oracle feed
+GET    /api/history             - Get transaction history
+
+POST   /api/transfer/native     - Direct native token transfer
 ```
 
-## 🧪 Testing
+## Smart Contract Functions
 
-### Smart Contracts
-```bash
-npm test
-npm run test:coverage
-npm run test:gas
-```
+**Employee Management:**
+- `addEmployee(address _wallet, uint256 _salary)` - Add new employee
+- `removeEmployee(address _wallet)` - Remove employee
+- `getEmployee(address _wallet)` - Get employee details
+- `getAllEmployees()` - Get all employee addresses
 
-### Backend
-```bash
-cd backend
-npm test
-```
+**Payroll Execution:**
+- `payEmployee(address _employeeAddress)` - Pay single employee
+- `payAllEmployees()` - Pay all employees in one transaction
 
-## 🔐 Security
+**Utility:**
+- `getBalance()` - Check contract balance
+- `emergencyWithdraw()` - Employer emergency withdrawal
+- `receive()` - Accept native token deposits
 
-- Employer-only access control
-- JWT + wallet signature authentication
-- Input validation on all endpoints
-- Safe ERC20 token handling
-- Oracle price verification
-- DEX slippage protection (2%)
+## Security
 
-## 🎯 Hackathon Requirements
+- Employer-only access control via `onlyEmployer` modifier
+- Input validation on all contract functions
+- Balance verification before payments
+- Safe native token transfer with error handling
+- Transaction receipts for all operations
 
-- ✅ Uses QIE Oracle Network for price feeds
-- ✅ Original project with live demo
-- ✅ Open source (MIT License)
-- ✅ Fully on-chain logic
-- ✅ Real-world use case (payroll automation)
+## Technology Stack
 
-## 🛣️ Roadmap
+**Blockchain:**
+- Solidity ^0.8.25
+- Hardhat development environment
+- Ethers.js v6
 
-- [ ] Multi-signature support for larger organizations
-- [ ] Email notifications for payment confirmations
-- [ ] CSV import for bulk employee addition
-- [ ] Historical analytics dashboard
-- [ ] Mobile app (React Native)
-- [ ] Multi-chain deployment
+**Backend:**
+- Node.js + TypeScript
+- Express.js
+- Axios for HTTP requests
 
-## 📄 License
+**Frontend:**
+- React 18 + TypeScript
+- Vite build tool
+- Wagmi for Web3 integration
+- RainbowKit for wallet connection
+- TanStack Query for state management
+
+## License
 
 MIT License - see LICENSE file for details
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please open an issue or PR.
 
-## 📧 Contact
+## Contact
 
-For questions or support regarding this hackathon project, please open an issue.
+For questions or support, please open an issue on GitHub.
 
 ---
 
-**Built for QIE Blockchain Hackathon** 🏆
+**Built for QIE Blockchain**
