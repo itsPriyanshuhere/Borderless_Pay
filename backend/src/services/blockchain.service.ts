@@ -11,13 +11,9 @@ class BlockchainService {
     private payrollContract: ethers.Contract;
 
     constructor() {
-        // Initialize provider
         this.provider = new ethers.JsonRpcProvider(config.rpcUrl);
-
-        // Initialize signer (use backendPrivateKey which is the deployer wallet)
         this.signer = new ethers.Wallet(config.backendPrivateKey, this.provider);
 
-        // Initialize contract
         this.payrollContract = new ethers.Contract(
             config.contractAddress,
             SimplePayrollABI,
@@ -25,7 +21,7 @@ class BlockchainService {
         );
     }
 
-    // Employee Management
+    
     async addEmployee(wallet: string, salary: string) {
         try {
             const tx = await this.payrollContract.addEmployee(
@@ -148,10 +144,63 @@ class BlockchainService {
         }
     }
 
+    async getTransactionHistory() {
+        try {
+            const currentBlock = await this.provider.getBlockNumber();
+            const fromBlock = Math.max(0, currentBlock - 10000); // Last ~10000 blocks
+
+            const [fundedEvents, paidEvents] = await Promise.all([
+                this.payrollContract.queryFilter(
+                    this.payrollContract.filters.PayrollFunded(),
+                    fromBlock,
+                    currentBlock
+                ),
+                this.payrollContract.queryFilter(
+                    this.payrollContract.filters.EmployeePaid(),
+                    fromBlock,
+                    currentBlock
+                ),
+            ]);
+
+            const transactions = [];
+
+            for (const event of fundedEvents) {
+                const block = await event.getBlock();
+                transactions.push({
+                    hash: event.transactionHash,
+                    type: 'fund',
+                    amount: ethers.formatEther(event.args?.amount || 0),
+                    to: 'Contract',
+                    timestamp: block.timestamp,
+                    status: 'success',
+                });
+            }
+
+            for (const event of paidEvents) {
+                const block = await event.getBlock();
+                transactions.push({
+                    hash: event.transactionHash,
+                    type: 'payout',
+                    amount: ethers.formatEther(event.args?.amount || 0),
+                    to: event.args?.wallet,
+                    timestamp: block.timestamp,
+                    status: 'success',
+                });
+            }
+
+            // Sort by timestamp descending
+            transactions.sort((a, b) => b.timestamp - a.timestamp);
+
+            return transactions;
+        } catch (error: any) {
+            throw new Error(`Failed to fetch transaction history: ${error.message}`);
+        }
+    }
+
     // Event Listeners
     listenToEvents() {
         this.payrollContract.on('EmployeeAdded', (wallet, token, symbol, salaryUSD, event) => {
-            console.log('✅ Employee Added:', {
+            console.log('Employee Added:', {
                 wallet,
                 token,
                 symbol,
@@ -161,7 +210,7 @@ class BlockchainService {
         });
 
         this.payrollContract.on('EmployeePaid', (wallet, token, symbol, amountToken, amountUSD, event) => {
-            console.log('💰 Employee Paid:', {
+            console.log('Employee Paid:', {
                 wallet,
                 token,
                 symbol,
@@ -172,14 +221,14 @@ class BlockchainService {
         });
 
         this.payrollContract.on('PayrollFunded', (employer, amount, event) => {
-            console.log('💵 Payroll Funded:', {
+            console.log('Payroll Funded:', {
                 employer,
                 amount: ethers.formatEther(amount),
                 txHash: event.log.transactionHash,
             });
         });
 
-        console.log('📡 Event listeners active');
+        console.log('Event listeners active');
     }
 
     // Utility

@@ -89,7 +89,6 @@ function Dashboard() {
             {/* Stats Grid */}
             <div className="stats-grid">
                 <div className="glass-card stat-card primary-glow">
-                    <div className="stat-icon">💰</div>
                     <div className="stat-content">
                         <h3>Total Balance</h3>
                         <p className="stat-value text-gradient">{parseFloat(balance).toLocaleString()} {networkSymbol}</p>
@@ -98,7 +97,6 @@ function Dashboard() {
                 </div>
 
                 <div className="glass-card stat-card">
-                    <div className="stat-icon">👥</div>
                     <div className="stat-content">
                         <h3>Active Employees</h3>
                         <p className="stat-value">{employeeCount}</p>
@@ -107,7 +105,6 @@ function Dashboard() {
                 </div>
 
                 <div className="glass-card stat-card">
-                    <div className="stat-icon">📅</div>
                     <div className="stat-content">
                         <h3>Next Payroll</h3>
                         <p className="stat-value">Dec 1st</p>

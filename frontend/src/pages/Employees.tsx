@@ -120,8 +120,7 @@ function Employees() {
 
                     {employees.length === 0 ? (
                         <div className="empty-state">
-                            <div className="icon">👥</div>
-                            <p>No employees registered yet.</p>
+                            <h3>No Employees Yet</h3>
                         </div>
                     ) : (
                         <div className="table-container">

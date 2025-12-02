@@ -129,7 +129,6 @@ function Payroll() {
                 {/* Fund Contract */}
                 <div className="glass-card payroll-card">
                     <div className="card-header">
-                        <div className="icon-wrapper">💵</div>
                         <h3>Fund Contract</h3>
                     </div>
                     <p className="card-desc">Add USDT liquidity to the payroll smart contract.</p>
@@ -156,7 +155,6 @@ function Payroll() {
                 {/* Pay Single */}
                 <div className="glass-card payroll-card">
                     <div className="card-header">
-                        <div className="icon-wrapper">👤</div>
                         <h3>Single Payment</h3>
                     </div>
                     <p className="card-desc">Manually trigger payment for one employee.</p>
@@ -182,7 +180,6 @@ function Payroll() {
                 {/* Batch Pay */}
                 <div className="glass-card payroll-card highlight-card">
                     <div className="card-header">
-                        <div className="icon-wrapper primary">🚀</div>
                         <h3>Execute Batch</h3>
                     </div>
                     <p className="card-desc">Pay all {employees.length} registered employees in one transaction.</p>

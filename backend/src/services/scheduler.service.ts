@@ -9,37 +9,37 @@ class SchedulerService {
     // Set employee addresses for scheduled payroll
     setEmployees(addresses: string[]) {
         this.employeeAddresses = addresses;
-        console.log(`📋 Scheduler updated with ${addresses.length} employees`);
+        console.log(`Scheduler updated with ${addresses.length} employees`);
     }
 
     // Start automated payroll scheduling
     start() {
         if (this.cronJob) {
-            console.log('⚠️  Scheduler already running');
+            console.log('Scheduler already running');
             return;
         }
 
         // Parse cron schedule from config (default: "0 0 1 * *" = monthly on the 1st)
         this.cronJob = cron.schedule(config.cronSchedule, async () => {
-            console.log(`\n⏰ Scheduled payroll execution triggered at ${new Date().toISOString()}`);
+            console.log(`Scheduled payroll execution triggered at ${new Date().toISOString()}`);
 
             if (this.employeeAddresses.length === 0) {
-                console.log('⚠️  No employees configured for scheduled payroll');
+                console.log(' No employees configured for scheduled payroll');
                 return;
             }
 
             try {
                 const result = await blockchainService.payAllEmployees(this.employeeAddresses);
-                console.log(`✅ Scheduled payroll completed successfully`);
+                console.log(`Scheduled payroll completed successfully`);
                 console.log(`   Transaction: ${result.txHash}`);
                 console.log(`   Employees paid: ${this.employeeAddresses.length}\n`);
             } catch (error: any) {
-                console.error('❌ Scheduled payroll failed:', error.message);
+                console.error('Scheduled payroll failed:', error.message);
                 // In production, you would send notifications here
             }
         });
 
-        console.log(`⏰ Payroll scheduler started with schedule: ${config.cronSchedule}`);
+        console.log(`Payroll scheduler started with schedule: ${config.cronSchedule}`);
         console.log(`   Next run: ${this.getNextRunTime()}\n`);
     }
 
@@ -48,7 +48,7 @@ class SchedulerService {
         if (this.cronJob) {
             this.cronJob.stop();
             this.cronJob = null;
-            console.log('⏸️  Payroll scheduler stopped');
+            console.log('Payroll scheduler stopped');
         }
     }
 

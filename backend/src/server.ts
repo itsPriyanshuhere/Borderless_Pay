@@ -8,6 +8,7 @@ import payrollRoutes from './routes/payroll.routes';
 import oracleRoutes from './routes/oracle.routes';
 import transferRoutes from './routes/transfer.routes';
 import authRoutes from './routes/auth.routes';
+import historyRoutes from './routes/history.routes';
 import blockchainService from './services/blockchain.service';
 
 const app: Application = express();
@@ -32,6 +33,7 @@ app.use('/api/employees', employeeRoutes);
 app.use('/api/payroll', payrollRoutes);
 app.use('/api/oracle', oracleRoutes);
 app.use('/api/transfer', transferRoutes);
+app.use('/api/history', historyRoutes);
 
 // Error handling middleware
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
@@ -51,19 +53,18 @@ app.use((req: Request, res: Response) => {
 const PORT = config.port;
 
 app.listen(PORT, () => {
-    console.log(`\n🚀 Crypto Payroll Backend Server`);
+    console.log(`\nCrypto Payroll Backend Server`);
     console.log(`==================================`);
-    console.log(`📡 Server running on port ${PORT}`);
-    console.log(`🌍 Environment: ${config.nodeEnv}`);
-    console.log(`⛓️  Contract: ${config.contractAddress || 'Not configured'}`);
-    console.log(`🔗 RPC: ${config.rpcUrl || 'Not configured'}`);
+    console.log(`Server running on port ${PORT}`);
+    console.log(`Environment: ${config.nodeEnv}`);
+    console.log(`Contract: ${config.contractAddress || 'Not configured'}`);
+    console.log(`RPC: ${config.rpcUrl || 'Not configured'}`);
     console.log(`==================================\n`);
 
-    // Start blockchain event listeners
     if (config.contractAddress && config.rpcUrl) {
         blockchainService.listenToEvents();
     } else {
-        console.warn('⚠️  Blockchain service not fully configured');
+        console.warn('Blockchain service not fully configured');
     }
 });
 
