@@ -107,7 +107,7 @@ const Landing = () => {
                         <a href="#" className="text-muted hover-glow">GitHub</a>
                         <a href="#" className="text-muted hover-glow">Twitter</a>
                     </div>
-                    <p className="text-muted" style={{ fontSize: '0.9rem' }}>© 2024 QIE Payroll Protocol. All rights reserved.</p>
+                    <p className="text-muted" style={{ fontSize: '0.9rem' }}>© 2025 QIE Payroll Protocol. All rights reserved.</p>
                 </div>
             </footer>
 
