@@ -60,6 +60,32 @@ router.get('/:address', async (req: Request, res: Response) => {
     }
 });
 
+router.put('/:address', async (req: Request, res: Response) => {
+    try {
+        const { address } = req.params;
+        const { salary } = req.body;
+
+        if (!ethers.isAddress(address)) {
+            return res.status(400).json({ error: 'Invalid address format' });
+        }
+
+        if (!salary || parseFloat(salary) <= 0) {
+            return res.status(400).json({ error: 'Invalid salary amount' });
+        }
+
+        const result = await blockchainService.updateEmployeeSalary(address, salary);
+
+        res.json({
+            success: true,
+            message: 'Employee salary updated successfully',
+            txHash: result.txHash,
+        });
+    } catch (error: any) {
+        console.error('Error updating employee:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 // Remove employee
 router.delete('/:address', async (req: Request, res: Response) => {
     try {

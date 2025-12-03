@@ -77,6 +77,20 @@ contract SimplePayroll {
     }
 
     /**
+     * @notice Update an employee's salary
+     * @param _wallet Employee wallet address
+     * @param _newSalary New salary in wei
+     */
+    function updateEmployeeSalary(address _wallet, uint256 _newSalary) external onlyEmployer {
+        require(employees[_wallet].exists, "Employee does not exist");
+        require(_newSalary > 0, "Salary must be greater than 0");
+        
+        employees[_wallet].salary = _newSalary;
+        
+        emit EmployeeAdded(_wallet, _newSalary);
+    }
+
+    /**
      * @notice Pay a single employee
      * @param _employeeAddress Employee wallet address
      */

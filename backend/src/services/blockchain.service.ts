@@ -47,6 +47,20 @@ class BlockchainService {
         }
     }
 
+    async updateEmployeeSalary(wallet: string, newSalary: string) {
+        try {
+            const tx = await this.payrollContract.updateEmployeeSalary(
+                wallet,
+                ethers.parseEther(newSalary)
+            );
+            const receipt = await tx.wait();
+            if (!receipt) throw new Error('Transaction failed');
+            return { success: true, txHash: receipt.hash };
+        } catch (error: any) {
+            throw new Error(`Failed to update employee salary: ${error.message}`);
+        }
+    }
+
     async getEmployee(wallet: string) {
         try {
             const employee = await this.payrollContract.getEmployee(wallet);
