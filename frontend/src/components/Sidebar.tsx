@@ -1,15 +1,25 @@
 import { Link, useLocation } from 'react-router-dom';
+import { useAccount } from 'wagmi';
+import { OWNER_ADDRESS } from '../config/wagmi';
 
 const Sidebar = () => {
     const location = useLocation();
+    const { address } = useAccount();
+
+    const isOwner = address && OWNER_ADDRESS && address.toLowerCase() === OWNER_ADDRESS.toLowerCase();
 
     const isActive = (path: string) => location.pathname === path;
 
     const navItems = [
         { path: '/dashboard', icon: '📊', label: 'Dashboard' },
-        { path: '/employees', icon: '👥', label: 'Employees' },
-        { path: '/payroll', icon: '💰', label: 'Run Payroll' },
-        { path: '/history', icon: '📜', label: 'History' },
+        { path: '/employee-dashboard', icon: '📈', label: 'My Stats' },
+        { path: '/invoices', icon: '🧾', label: 'Invoices' },
+        // Only show these to owner
+        ...(isOwner ? [
+            { path: '/employees', icon: '👥', label: 'Employees' },
+            { path: '/payroll', icon: '💰', label: 'Run Payroll' },
+            { path: '/history', icon: '📜', label: 'History' },
+        ] : []),
     ];
 
     return (

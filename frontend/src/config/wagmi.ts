@@ -22,3 +22,5 @@ export const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || import.meta.env.R
 
 export const VITE_QIE_RPC_URL = import.meta.env.VITE_QIE_RPC_URL || import.meta.env.REACT_APP_QIE_RPC_URL || 'https://rpc1testnet.qie.digital/';
 export const VITE_SEPOLIA_RPC_URL = import.meta.env.VITE_SEPOLIA_RPC_URL || import.meta.env.REACT_APP_SEPOLIA_RPC_URL || 'https://eth-sepolia.g.alchemy.com/v2/';
+
+export const OWNER_ADDRESS = import.meta.env.VITE_OWNER_ADDRESS || '';

@@ -1,8 +1,12 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAccount } from 'wagmi';
 import axios from 'axios';
-import { BACKEND_URL } from '../config/wagmi';
+import { BACKEND_URL, OWNER_ADDRESS } from '../config/wagmi';
 
 function Employees() {
+    const { address } = useAccount();
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         wallet: '',
         salaryUSD: '',
@@ -12,8 +16,12 @@ function Employees() {
     const [employees, setEmployees] = useState<Array<{ wallet: string; salaryUSD: string; exists?: boolean }>>([]);
 
     useEffect(() => {
+        if (address && OWNER_ADDRESS && address.toLowerCase() !== OWNER_ADDRESS.toLowerCase()) {
+            navigate('/dashboard');
+            return;
+        }
         fetchEmployees();
-    }, []);
+    }, [address, navigate]);
 
     const fetchEmployees = async () => {
         try {

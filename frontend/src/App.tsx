@@ -5,6 +5,8 @@ import Dashboard from './pages/Dashboard';
 import Employees from './pages/Employees';
 import Payroll from './pages/Payroll';
 import History from './pages/History';
+import EmployeeDashboard from './pages/EmployeeDashboard';
+import Invoices from './pages/Invoices';
 import Sidebar from './components/Sidebar';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 
@@ -38,6 +40,8 @@ function App() {
                                                 <Route path="/employees" element={<Employees />} />
                                                 <Route path="/payroll" element={<Payroll />} />
                                                 <Route path="/history" element={<History />} />
+                                                <Route path="/employee-dashboard" element={<EmployeeDashboard />} />
+                                                <Route path="/invoices" element={<Invoices />} />
                                                 <Route path="*" element={<Navigate to="/dashboard" replace />} />
                                             </Routes>
                                         </main>

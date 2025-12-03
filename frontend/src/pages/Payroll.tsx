@@ -1,8 +1,12 @@
 import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAccount } from 'wagmi';
 import axios from 'axios';
-import { BACKEND_URL } from '../config/wagmi';
+import { BACKEND_URL, OWNER_ADDRESS } from '../config/wagmi';
 
 function Payroll() {
+    const { address } = useAccount();
+    const navigate = useNavigate();
     const [fundAmount, setFundAmount] = useState('');
     const [employeeAddress, setEmployeeAddress] = useState('');
     const [loading, setLoading] = useState(false);
@@ -12,8 +16,12 @@ function Payroll() {
     const [totalRequired, setTotalRequired] = useState<number>(0);
 
     useEffect(() => {
+        if (address && OWNER_ADDRESS && address.toLowerCase() !== OWNER_ADDRESS.toLowerCase()) {
+            navigate('/dashboard');
+            return;
+        }
         fetchMetadata();
-    }, []);
+    }, [address, navigate]);
 
     const fetchMetadata = async () => {
         try {

@@ -1,0 +1,12 @@
+[
+  {
+    "id": "c60c7de4-150a-4037-a715-afd88e7477e5",
+    "employeeWallet": "0xB879b59A6bB4c61e9A3B073D17F88bcc69ADB8b3",
+    "amount": "0.01",
+    "description": "Bug Report",
+    "status": "paid",
+    "createdAt": 1764753142879,
+    "paidAt": 1764753390660,
+    "txHash": "0xa491ff71958bebd5e5f8265e3ccaf7df7472f04cf4afafddf11dc6f7097c0377"
+  }
+]

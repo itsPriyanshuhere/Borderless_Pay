@@ -21,7 +21,7 @@ class BlockchainService {
         );
     }
 
-    
+
     async addEmployee(wallet: string, salary: string) {
         try {
             const tx = await this.payrollContract.addEmployee(
@@ -194,6 +194,43 @@ class BlockchainService {
             return transactions;
         } catch (error: any) {
             throw new Error(`Failed to fetch transaction history: ${error.message}`);
+        }
+    }
+
+    async getEmployeeStats(wallet: string) {
+        try {
+            const transactions = await this.getTransactionHistory();
+
+            // Filter for employee
+            const employeeTx = transactions.filter(tx =>
+                tx.to?.toLowerCase() === wallet.toLowerCase() && tx.type === 'payout'
+            );
+
+            // Group by month for the last 6 months
+            const monthlyStats = new Map<string, number>();
+            const now = new Date();
+
+            for (let i = 5; i >= 0; i--) {
+                const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+                const key = d.toLocaleString('default', { month: 'short' });
+                monthlyStats.set(key, 0);
+            }
+
+            employeeTx.forEach(tx => {
+                const date = new Date(tx.timestamp * 1000);
+                const key = date.toLocaleString('default', { month: 'short' });
+                if (monthlyStats.has(key)) {
+                    monthlyStats.set(key, (monthlyStats.get(key) || 0) + parseFloat(tx.amount));
+                }
+            });
+
+            return {
+                totalEarned: employeeTx.reduce((acc, tx) => acc + parseFloat(tx.amount), 0),
+                transactionCount: employeeTx.length,
+                chartData: Array.from(monthlyStats.entries()).map(([name, value]) => ({ name, value }))
+            };
+        } catch (error: any) {
+            throw new Error(`Failed to get employee stats: ${error.message}`);
         }
     }
 

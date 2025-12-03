@@ -17,4 +17,15 @@ router.get('/', async (req: Request, res: Response) => {
     }
 });
 
+router.get('/stats/:wallet', async (req: Request, res: Response) => {
+    try {
+        const { wallet } = req.params;
+        const stats = await blockchainService.getEmployeeStats(wallet);
+        res.json({ success: true, stats });
+    } catch (error: any) {
+        console.error('Error fetching stats:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 export default router;

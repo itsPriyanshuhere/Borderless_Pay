@@ -9,6 +9,7 @@ import oracleRoutes from './routes/oracle.routes';
 import transferRoutes from './routes/transfer.routes';
 import authRoutes from './routes/auth.routes';
 import historyRoutes from './routes/history.routes';
+import invoiceRoutes from './routes/invoice.routes';
 import blockchainService from './services/blockchain.service';
 
 const app: Application = express();
@@ -34,6 +35,7 @@ app.use('/api/payroll', payrollRoutes);
 app.use('/api/oracle', oracleRoutes);
 app.use('/api/transfer', transferRoutes);
 app.use('/api/history', historyRoutes);
+app.use('/api/invoices', invoiceRoutes);
 
 // Error handling middleware
 app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
