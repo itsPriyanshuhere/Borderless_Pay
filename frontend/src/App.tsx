@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useAccount } from 'wagmi';
 import Landing from './pages/Landing';
+import Docs from './pages/Docs';
 import Dashboard from './pages/Dashboard';
 import Employees from './pages/Employees';
 import Payroll from './pages/Payroll';
@@ -18,6 +19,7 @@ function App() {
             <div className="app">
                 <Routes>
                     <Route path="/" element={<Landing />} />
+                    <Route path="/docs" element={<Docs />} />
 
                     {/* Protected Routes */}
                     <Route
@@ -29,7 +31,7 @@ function App() {
                                     <div className="app-content">
                                         <header className="dashboard-header glass-card">
                                             <div className="header-title">
-                                                <h2>QIE Payroll</h2>
+                                                <h2>BORDERLESS PAY</h2>
                                                 <span className="subtitle">Dashboard</span>
                                             </div>
                                             <ConnectButton />

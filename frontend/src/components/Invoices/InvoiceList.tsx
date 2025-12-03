@@ -29,7 +29,7 @@ const InvoiceList = ({ invoices, isEmployer, onPay }: InvoiceListProps) => {
                             <th>Description</th>
                             <th>Amount</th>
                             <th>Status</th>
-                            {isEmployer && <th>Action</th>}
+                            <th>Action</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -50,17 +50,30 @@ const InvoiceList = ({ invoices, isEmployer, onPay }: InvoiceListProps) => {
                                             {invoice.status}
                                         </span>
                                     </td>
-                                    {isEmployer && (
-                                        <td>
-                                            {invoice.status === 'pending' && (
-                                                <button
-                                                    className="btn-primary btn-sm"
-                                                    onClick={() => onPay?.(invoice)}
-                                                >
-                                                    Pay
-                                                </button>
-                                            )}
-                                            {invoice.status === 'paid' && (
+                                    <td>
+                                        {isEmployer ? (
+                                            <>
+                                                {invoice.status === 'pending' && (
+                                                    <button
+                                                        className="btn-primary btn-sm"
+                                                        onClick={() => onPay?.(invoice)}
+                                                    >
+                                                        Pay
+                                                    </button>
+                                                )}
+                                                {invoice.status === 'paid' && (
+                                                    <a
+                                                        href={`https://testnet.qie.digital/tx/${invoice.txHash}`}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="text-blue"
+                                                    >
+                                                        View Tx
+                                                    </a>
+                                                )}
+                                            </>
+                                        ) : (
+                                            invoice.status === 'paid' ? (
                                                 <a
                                                     href={`https://testnet.qie.digital/tx/${invoice.txHash}`}
                                                     target="_blank"
@@ -69,9 +82,11 @@ const InvoiceList = ({ invoices, isEmployer, onPay }: InvoiceListProps) => {
                                                 >
                                                     View Tx
                                                 </a>
-                                            )}
-                                        </td>
-                                    )}
+                                            ) : (
+                                                <span className="text-muted">-</span>
+                                            )
+                                        )}
+                                    </td>
                                 </tr>
                             ))
                         )}

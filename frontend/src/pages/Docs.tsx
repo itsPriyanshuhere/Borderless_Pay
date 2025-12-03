@@ -39,7 +39,7 @@ const Docs = () => {
                     {activeSection === 'smart-contract' && (
                         <div className="section-content">
                             <h2>Smart Contract Architecture</h2>
-                            <p>The QIE Payroll Protocol uses a modular smart contract system designed for gas efficiency and security.</p>
+                            <p>The BORDERLESS PAY Protocol uses a modular smart contract system designed for gas efficiency and security.</p>
 
                             <div className="code-block">
                                 <div className="code-header">

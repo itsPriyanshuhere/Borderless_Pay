@@ -15,7 +15,7 @@ const Landing = () => {
             <nav className="landing-nav glass-card">
                 <div className="container flex-center" style={{ justifyContent: 'space-between', padding: '1rem 0' }}>
                     <div className="logo">
-                        <h1 className="text-gradient" style={{ fontSize: '1.5rem' }}>QIE Payroll</h1>
+                        <h1 className="text-gradient" style={{ fontSize: '1.5rem' }}>BORDERLESS PAY</h1>
                     </div>
                     <div className="nav-actions">
                         <ConnectButton />
@@ -51,29 +51,6 @@ const Landing = () => {
                 </div>
             </section>
 
-            {/* Features Section */}
-            <section className="features-section" style={{ padding: '4rem 0' }}>
-                <div className="container">
-                    <div className="grid-cols-3">
-                        <div className="glass-card feature-card">
-                            <div className="icon-glow">💎</div>
-                            <h3>Multi-Token Payroll</h3>
-                            <p>Pay in USDT, ETH, or QIE. Employees receive their preferred token automatically via DEX integration.</p>
-                        </div>
-                        <div className="glass-card feature-card">
-                            <div className="icon-glow">⚡</div>
-                            <h3>Real-Time Oracles</h3>
-                            <p>Powered by QIE Oracle Network for precise, tamper-proof exchange rates at the moment of payment.</p>
-                        </div>
-                        <div className="glass-card feature-card">
-                            <div className="icon-glow">🛡️</div>
-                            <h3>Trustless Security</h3>
-                            <p>Non-custodial smart contracts ensure funds are safe. No middleman, just code.</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
             {/* How It Works */}
             <section className="how-it-works" style={{ padding: '6rem 0' }}>
                 <div className="container">
@@ -98,16 +75,36 @@ const Landing = () => {
                 </div>
             </section>
 
+            {/* Features Section */}
+            <section className="features-section" style={{ padding: '4rem 0' }}>
+                <div className="container">
+                    <h2 className="text-center text-gradient" style={{ marginBottom: '3rem', fontSize: '2.5rem', textAlign: 'center' }}>Features</h2>
+                    <div className="grid-cols-3">
+                        <div className="glass-card feature-card">
+                            <div className="icon-glow">💎</div>
+                            <h3>Multi-Token Payroll</h3>
+                            <p>Pay in USDT, ETH, or QIE. Employees receive their preferred token.</p>
+                        </div>
+                        <div className="glass-card feature-card">
+                            <div className="icon-glow">⚡</div>
+                            <h3>Real-Time Oracles</h3>
+                            <p>Powered by QIE Oracle Network for precise, tamper-proof exchange rates at the moment of payment.</p>
+                        </div>
+                        <div className="glass-card feature-card">
+                            <div className="icon-glow">🛡️</div>
+                            <h3>Trustless Security</h3>
+                            <p>Non-custodial smart contracts ensure funds are safe. No middleman, just code.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             {/* Footer */}
             <footer className="footer" style={{ borderTop: '1px solid var(--border-glass)', padding: '3rem 0', marginTop: '4rem' }}>
                 <div className="container flex-center" style={{ flexDirection: 'column', gap: '1.5rem' }}>
-                    <h3 className="text-gradient">QIE Payroll Protocol</h3>
-                    <div className="footer-links flex-center" style={{ gap: '2rem' }}>
-                        <a href="#" className="text-muted hover-glow">Documentation</a>
-                        <a href="#" className="text-muted hover-glow">GitHub</a>
-                        <a href="#" className="text-muted hover-glow">Twitter</a>
-                    </div>
-                    <p className="text-muted" style={{ fontSize: '0.9rem' }}>© 2025 QIE Payroll Protocol. All rights reserved.</p>
+                    <h3 className="text-gradient">BORDERLESS PAY Protocol</h3>
+
+                    <p className="text-muted" style={{ fontSize: '0.9rem' }}>© 2025 BORDERLESS PAY Protocol. All rights reserved.</p>
                 </div>
             </footer>
 
@@ -177,7 +174,7 @@ const Landing = () => {
                     font-weight: 700;
                     color: rgba(255, 255, 255, 0.05);
                     position: absolute;
-                    top: 1rem;
+                    top: 0rem;
                     right: 1.5rem;
                 }
 
