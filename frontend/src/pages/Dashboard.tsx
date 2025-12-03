@@ -6,6 +6,7 @@ import { getPrice } from '../services/pricing.service';
 import { TransferForm } from '../components/TransferForm';
 import { getNetwork, getBackendChainName } from '../config/networks';
 import { useIsOwner } from '../hooks/isOwner';
+import OwnerChart from '../components/Dashboard/OwnerChart';
 
 function Dashboard() {
     const { isConnected, address, chainId } = useWallet();
@@ -16,13 +17,20 @@ function Dashboard() {
     const [employeeCount, setEmployeeCount] = useState<number>(0);
     const isOwner = useIsOwner();
 
+    const [ownerStats, setOwnerStats] = useState<{
+        currentBalance: number;
+        totalFunded: number;
+        totalSpent: number;
+        chartData: Array<{ name: string; funded: number; spent: number }>;
+    } | null>(null);
+
     useEffect(() => {
         if (isConnected && chainId) {
             const network = getNetwork(chainId);
             setNetworkSymbol(network?.nativeCurrency.symbol || 'ETH');
             fetchDashboardData();
         }
-    }, [isConnected, chainId, address]);
+    }, [isConnected, chainId, address, isOwner]);
 
     const fetchDashboardData = async () => {
         setLoading(true);
@@ -48,6 +56,17 @@ function Dashboard() {
                 }
             } catch (err) {
                 console.error('Failed to fetch employees:', err);
+            }
+
+            if (isOwner) {
+                try {
+                    const statsRes = await axios.get(`${BACKEND_URL}/api/payroll/stats`);
+                    if (statsRes.data?.success) {
+                        setOwnerStats(statsRes.data.stats);
+                    }
+                } catch (err) {
+                    console.error('Failed to fetch owner stats:', err);
+                }
             }
 
             // Fetch live prices
@@ -114,6 +133,40 @@ function Dashboard() {
                     </div>
                 </div>
             </div>
+
+            {isOwner && ownerStats && (
+                <div className="glass-card owner-stats-section">
+                    <div className="section-header">
+                        <h3>Account Funding & Spending Analytics</h3>
+                        <span className="text-muted">Last 30 Days</span>
+                    </div>
+
+                    <div className="owner-summary-grid">
+                        <div className="summary-card">
+                            <span className="summary-label">Current Balance</span>
+                            <span className="summary-value text-gradient">
+                                {ownerStats.currentBalance.toFixed(4)} {networkSymbol}
+                            </span>
+                        </div>
+                        <div className="summary-card funded">
+                            <span className="summary-label">Total Funded</span>
+                            <span className="summary-value">
+                                {ownerStats.totalFunded.toFixed(4)} {networkSymbol}
+                            </span>
+                        </div>
+                        <div className="summary-card spent">
+                            <span className="summary-label">Total Spent</span>
+                            <span className="summary-value">
+                                {ownerStats.totalSpent.toFixed(4)} {networkSymbol}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div className="chart-container">
+                        <OwnerChart data={ownerStats.chartData} />
+                    </div>
+                </div>
+            )}
 
             <div className="main-content-grid">
                 {/* Oracle Prices */}
@@ -276,6 +329,80 @@ function Dashboard() {
                     display: flex;
                     flex-direction: column;
                     gap: 1rem;
+                }
+
+                .owner-stats-section {
+                    padding: 2rem;
+                    margin-top: 2rem;
+                }
+
+                .owner-summary-grid {
+                    display: grid;
+                    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                    gap: 1rem;
+                    margin-bottom: 2rem;
+                }
+
+                .summary-card {
+                    background: rgba(255, 255, 255, 0.03);
+                    padding: 1.5rem;
+                    border-radius: 12px;
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                    display: flex;
+                    flex-direction: column;
+                    gap: 0.5rem;
+                    transition: all 0.3s ease;
+                }
+
+                .summary-card:hover {
+                    transform: translateY(-2px);
+                    border-color: var(--neon-blue);
+                }
+
+                .summary-card.funded {
+                    border-color: rgba(10, 255, 96, 0.3);
+                }
+
+                .summary-card.funded:hover {
+                    border-color: var(--neon-green);
+                    box-shadow: 0 0 15px rgba(10, 255, 96, 0.2);
+                }
+
+                .summary-card.spent {
+                    border-color: rgba(255, 107, 107, 0.3);
+                }
+
+                .summary-card.spent:hover {
+                    border-color: #ff6b6b;
+                    box-shadow: 0 0 15px rgba(255, 107, 107, 0.2);
+                }
+
+                .summary-label {
+                    font-size: 0.85rem;
+                    color: var(--text-muted);
+                    text-transform: uppercase;
+                    letter-spacing: 0.5px;
+                }
+
+                .summary-value {
+                    font-size: 1.75rem;
+                    font-weight: 700;
+                    color: white;
+                }
+
+                .summary-card.funded .summary-value {
+                    color: var(--neon-green);
+                }
+
+                .summary-card.spent .summary-value {
+                    color: #ff6b6b;
+                }
+
+                .chart-container {
+                    background: rgba(0, 0, 0, 0.2);
+                    padding: 1.5rem;
+                    border-radius: 12px;
+                    border: 1px solid rgba(255, 255, 255, 0.05);
                 }
 
                 .transfer-section {

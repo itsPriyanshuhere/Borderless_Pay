@@ -166,10 +166,11 @@ class BlockchainService {
 
             for (const event of fundedEvents) {
                 const block = await event.getBlock();
+                const eventLog = event as ethers.EventLog;
                 transactions.push({
                     hash: event.transactionHash,
                     type: 'fund',
-                    amount: ethers.formatEther(event.args?.amount || 0),
+                    amount: ethers.formatEther(eventLog.args?.amount || 0),
                     to: 'Contract',
                     timestamp: block.timestamp,
                     status: 'success',
@@ -178,11 +179,12 @@ class BlockchainService {
 
             for (const event of paidEvents) {
                 const block = await event.getBlock();
+                const eventLog = event as ethers.EventLog;
                 transactions.push({
                     hash: event.transactionHash,
                     type: 'payout',
-                    amount: ethers.formatEther(event.args?.amount || 0),
-                    to: event.args?.wallet,
+                    amount: ethers.formatEther(eventLog.args?.amount || 0),
+                    to: eventLog.args?.wallet,
                     timestamp: block.timestamp,
                     status: 'success',
                 });
@@ -231,6 +233,82 @@ class BlockchainService {
             };
         } catch (error: any) {
             throw new Error(`Failed to get employee stats: ${error.message}`);
+        }
+    }
+
+    async getOwnerStats() {
+        try {
+            const currentBlock = await this.provider.getBlockNumber();
+            const fromBlock = Math.max(0, currentBlock - 10000); // Last ~10000 blocks
+
+            const [fundedEvents, paidEvents] = await Promise.all([
+                this.payrollContract.queryFilter(
+                    this.payrollContract.filters.PayrollFunded(),
+                    fromBlock,
+                    currentBlock
+                ),
+                this.payrollContract.queryFilter(
+                    this.payrollContract.filters.EmployeePaid(),
+                    fromBlock,
+                    currentBlock
+                ),
+            ]);
+
+            const currentBalance = await this.getBalance();
+
+            const dailyStats = new Map<string, { funded: number; spent: number }>();
+            const now = Date.now();
+
+            for (let i = 29; i >= 0; i--) {
+                const d = new Date(now - i * 24 * 60 * 60 * 1000);
+                const key = d.toLocaleDateString('default', { month: 'short', day: 'numeric' });
+                dailyStats.set(key, { funded: 0, spent: 0 });
+            }
+
+            let totalFunded = 0;
+            for (const event of fundedEvents) {
+                const block = await event.getBlock();
+                const eventLog = event as ethers.EventLog;
+                const date = new Date(block.timestamp * 1000);
+                const key = date.toLocaleDateString('default', { month: 'short', day: 'numeric' });
+                const amount = parseFloat(ethers.formatEther(eventLog.args?.amount || 0));
+                totalFunded += amount;
+
+                if (dailyStats.has(key)) {
+                    const stats = dailyStats.get(key)!;
+                    stats.funded += amount;
+                }
+            }
+
+            let totalSpent = 0;
+            for (const event of paidEvents) {
+                const block = await event.getBlock();
+                const eventLog = event as ethers.EventLog;
+                const date = new Date(block.timestamp * 1000);
+                const key = date.toLocaleDateString('default', { month: 'short', day: 'numeric' });
+                const amount = parseFloat(ethers.formatEther(eventLog.args?.amount || 0));
+                totalSpent += amount;
+
+                if (dailyStats.has(key)) {
+                    const stats = dailyStats.get(key)!;
+                    stats.spent += amount;
+                }
+            }
+
+            const chartData = Array.from(dailyStats.entries()).map(([name, data]) => ({
+                name,
+                funded: parseFloat(data.funded.toFixed(4)),
+                spent: parseFloat(data.spent.toFixed(4)),
+            }));
+
+            return {
+                currentBalance: parseFloat(currentBalance),
+                totalFunded: parseFloat(totalFunded.toFixed(4)),
+                totalSpent: parseFloat(totalSpent.toFixed(4)),
+                chartData,
+            };
+        } catch (error: any) {
+            throw new Error(`Failed to get owner stats: ${error.message}`);
         }
     }
 

@@ -94,4 +94,18 @@ router.post('/execute', async (req: Request, res: Response) => {
     }
 });
 
+router.get('/stats', async (req: Request, res: Response) => {
+    try {
+        const stats = await blockchainService.getOwnerStats();
+
+        res.json({
+            success: true,
+            stats,
+        });
+    } catch (error: any) {
+        console.error('Error fetching owner stats:', error);
+        res.status(500).json({ error: error.message });
+    }
+});
+
 export default router;

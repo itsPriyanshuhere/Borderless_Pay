@@ -12,13 +12,14 @@ const Sidebar = () => {
 
     const navItems = [
         { path: '/dashboard', icon: '📊', label: 'Dashboard' },
-        { path: '/employee-dashboard', icon: '📈', label: 'My Stats' },
         { path: '/invoices', icon: '🧾', label: 'Invoices' },
-        // Only show these to owner
         ...(isOwner ? [
             { path: '/employees', icon: '👥', label: 'Employees' },
             { path: '/payroll', icon: '💰', label: 'Run Payroll' },
             { path: '/history', icon: '📜', label: 'History' },
+        ] : []),
+        ...(!isOwner ? [
+            { path: '/employee-dashboard', icon: '📈', label: 'My Stats' },
         ] : []),
     ];
 

@@ -3,6 +3,8 @@ import { useAccount } from 'wagmi';
 import axios from 'axios';
 import { BACKEND_URL } from '../config/wagmi';
 import IncomeChart from '../components/Dashboard/IncomeChart';
+import OwnerChart from '../components/Dashboard/OwnerChart';
+import { useIsOwner } from '../hooks/isOwner';
 
 interface DashboardStats {
     totalEarned: number;
@@ -14,12 +16,17 @@ const EmployeeDashboard = () => {
     const { address } = useAccount();
     const [stats, setStats] = useState<DashboardStats | null>(null);
     const [loading, setLoading] = useState(true);
+    const [ownerChartData, setOwnerChartData] = useState<any[] | null>(null);
+    const isOwner = useIsOwner();
 
     useEffect(() => {
-        if (address) {
+       
+        if (isOwner) {
+            fetchStatsForOwner();
+        } else if (address) {
             fetchStats();
         }
-    }, [address]);
+    }, [address, isOwner]);
 
     const fetchStats = async () => {
         try {
@@ -34,13 +41,47 @@ const EmployeeDashboard = () => {
         }
     };
 
+    const fetchStatsForOwner = async () => {
+        try {
+            setLoading(true);
+            const res = await axios.get(`${BACKEND_URL}/api/history/stats`);
+            if (res.data?.success) {
+                const s = res.data.stats;
+                if (s?.spending && s?.buying) {
+                    const merged: any[] = [];
+                    const len = Math.max(s.spending.length, s.buying.length);
+                    for (let i = 0; i < len; i++) {
+                        const sp = s.spending[i] || { name: `T${i+1}`, value: 0 };
+                        const by = s.buying[i] || { name: sp.name || `T${i+1}`, value: 0 };
+                        merged.push({ name: sp.name || by.name, spending: sp.value || 0, buying: by.value || 0 });
+                    }
+                    setStats({
+                        totalEarned: s.totalEarned || 0,
+                        transactionCount: s.transactionCount || 0,
+                        chartData: merged.map((m: any) => ({ name: m.name, value: m.spending }))
+                    });
+                    setOwnerChartData(merged);
+                } else if (s?.chartData) {
+                    setStats(s);
+                    setOwnerChartData(s.chartData.map((d: any) => ({ name: d.name, spending: d.value, buying: d.value })));
+                } else {
+                    setStats(s);
+                }
+            }
+        } catch (error) {
+            console.error('Failed to fetch owner stats:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     if (loading) return <div className="loading">Loading dashboard...</div>;
 
     return (
         <div className="dashboard-page">
             <div className="page-header">
-                <h2>Employee Dashboard</h2>
-                <p className="text-muted">Overview of your earnings and activity</p>
+                <h2>{isOwner ? 'Dashboard' : 'Employee Dashboard'}</h2>
+                <p className="text-muted">{isOwner ? 'Overview of company spending and buying' : 'Overview of your earnings and activity'}</p>
             </div>
 
             <div className="stats-grid">
@@ -55,9 +96,13 @@ const EmployeeDashboard = () => {
             </div>
 
             <div className="glass-card chart-section">
-                <h3>Income Over Time</h3>
+                <h3>{isOwner ? 'Spending & Buying Over Time' : 'Income Over Time'}</h3>
                 <div className="chart-container">
-                    {stats?.chartData && <IncomeChart data={stats.chartData} />}
+                    {isOwner ? (
+                        ownerChartData && <OwnerChart data={ownerChartData} />
+                    ) : (
+                        stats?.chartData && <IncomeChart data={stats.chartData} />
+                    )}
                 </div>
             </div>
 
