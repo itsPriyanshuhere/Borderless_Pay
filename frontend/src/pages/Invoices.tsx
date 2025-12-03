@@ -5,6 +5,7 @@ import axios from 'axios';
 import { BACKEND_URL, OWNER_ADDRESS } from '../config/wagmi';
 import InvoiceList from '../components/Invoices/InvoiceList';
 import CreateInvoiceModal from '../components/Invoices/CreateInvoiceModal';
+import { useIsOwner } from '../hooks/isOwner';
 
 interface Invoice {
     id: string;
@@ -22,7 +23,8 @@ const Invoices = () => {
     const [invoices, setInvoices] = useState<Invoice[]>([]);
     const [loading, setLoading] = useState(true);
     const [isModalOpen, setIsModalOpen] = useState(false);
-    const [activeTab, setActiveTab] = useState<'my' | 'all'>('my');
+    const isOwner = useIsOwner();
+    const [activeTab, setActiveTab] = useState<'my' | 'all'>(isOwner ? 'all' : 'my');
 
     // For paying invoices
     const { sendTransaction, data: hash } = useSendTransaction();
@@ -39,6 +41,8 @@ const Invoices = () => {
             fetchInvoices();
         }
     }, [address, activeTab]);
+
+    // Owners start on the 'all' tab by default (handled in initial state)
 
     useEffect(() => {
         if (isTxSuccess && payingInvoiceId && hash) {
@@ -108,15 +112,21 @@ const Invoices = () => {
                 </div>
 
                 <div className="tabs">
-                    <button
-                        className={`tab-btn ${activeTab === 'my' ? 'active' : ''}`}
-                        onClick={() => setActiveTab('my')}
-                    >
-                        My Invoices
-                    </button>
+                    {
+                        !isOwner && (
+                            <button
+                                className={`tab-btn ${activeTab === 'my' ? 'active' : ''}`}
+                                onClick={() => setActiveTab('my')}
+                            >
+                                My Invoices
+                            </button>
+                        )
+                    }
+
                     {isEmployer && (
                         <button
                             className={`tab-btn ${activeTab === 'all' ? 'active' : ''}`}
+                            autoFocus={isOwner}
                             onClick={() => setActiveTab('all')}
                         >
                             All Invoices
@@ -136,7 +146,7 @@ const Invoices = () => {
             )}
 
             <CreateInvoiceModal
-                isOpen={isModalOpen}
+                isOpen={isModalOpen && !isOwner}
                 onClose={() => setIsModalOpen(false)}
                 onSuccess={fetchInvoices}
                 employeeWallet={address || ''}

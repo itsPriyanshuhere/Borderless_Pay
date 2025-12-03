@@ -117,7 +117,7 @@ function History() {
                                         </td>
                                         <td>
                                             <a
-                                                href={`https://testnet.qiescan.com/tx/${tx.hash}`}
+                                                href={`https://testnet.qie.digital/tx/${tx.hash}`}
                                                 target="_blank"
                                                 rel="noopener noreferrer"
                                                 className="hash-link"

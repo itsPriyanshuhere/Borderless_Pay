@@ -62,7 +62,7 @@ const InvoiceList = ({ invoices, isEmployer, onPay }: InvoiceListProps) => {
                                             )}
                                             {invoice.status === 'paid' && (
                                                 <a
-                                                    href={`https://testnet.qiescan.com/tx/${invoice.txHash}`}
+                                                    href={`https://testnet.qie.digital/tx/${invoice.txHash}`}
                                                     target="_blank"
                                                     rel="noopener noreferrer"
                                                     className="text-blue"

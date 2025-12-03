@@ -5,6 +5,7 @@ import { useWallet } from '../hooks/useWallet';
 import { getPrice } from '../services/pricing.service';
 import { TransferForm } from '../components/TransferForm';
 import { getNetwork, getBackendChainName } from '../config/networks';
+import { useIsOwner } from '../hooks/isOwner';
 
 function Dashboard() {
     const { isConnected, address, chainId } = useWallet();
@@ -13,6 +14,7 @@ function Dashboard() {
     const [loading, setLoading] = useState(false);
     const [networkSymbol, setNetworkSymbol] = useState('ETH');
     const [employeeCount, setEmployeeCount] = useState<number>(0);
+    const isOwner = useIsOwner();
 
     useEffect(() => {
         if (isConnected && chainId) {
@@ -135,17 +137,21 @@ function Dashboard() {
                 </div>
 
                 {/* Quick Actions */}
-                <div className="glass-card actions-section">
-                    <h3>Quick Actions</h3>
-                    <div className="action-buttons">
-                        <button className="btn-secondary" onClick={() => window.location.href = '/employees'}>
-                            ➕ Add Employee
-                        </button>
-                        <button className="btn-primary" onClick={() => window.location.href = '/payroll'}>
-                            ⚡ Execute Payroll
-                        </button>
-                    </div>
-                </div>
+                {
+                    isOwner && (
+                        <div className="glass-card actions-section">
+                            <h3>Quick Actions</h3>
+                            <div className="action-buttons">
+                                <button className="btn-secondary" onClick={() => window.location.href = '/employees'}>
+                                    ➕ Add Employee
+                                </button>
+                                <button className="btn-primary" onClick={() => window.location.href = '/payroll'}>
+                                    ⚡ Execute Payroll
+                                </button>
+                            </div>
+                        </div>
+                    )
+                }
             </div>
 
             {/* Transfer Form Section */}
