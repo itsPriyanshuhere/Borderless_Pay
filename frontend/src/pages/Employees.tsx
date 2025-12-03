@@ -80,7 +80,7 @@ function Employees() {
                 <div className="glass-card form-section">
                     <h3>Add New Employee</h3>
                     <form onSubmit={handleSubmit} className="employee-form">
-                        <div className="form-group">
+                        <div className="form-group" style={{marginTop: '1rem'}}>
                             <label htmlFor="wallet">Wallet Address</label>
                             <input
                                 id="wallet"
@@ -93,13 +93,14 @@ function Employees() {
                             />
                         </div>
 
-                        <div className="form-group">
-                            <label htmlFor="salaryUSD">Monthly Salary (USD)</label>
+                        <div className="form-group" style={{marginTop: '1rem'}}>
+                            <label htmlFor="salaryUSD">Monthly Salary (In Token)</label>
                             <input
                                 id="salaryUSD"
                                 type="number"
-                                placeholder="5000"
+                                placeholder="1.5"
                                 step="0.01"
+                                min="0.01"
                                 value={formData.salaryUSD}
                                 onChange={(e) => setFormData({ ...formData, salaryUSD: e.target.value })}
                                 required
@@ -113,7 +114,7 @@ function Employees() {
                             </div>
                         )}
 
-                        <button type="submit" className="btn-primary full-width" disabled={loading}>
+                        <button type="submit" className="btn-primary full-width" disabled={loading} style={{marginTop: '1rem'}}>
                             {loading ? 'Adding...' : '➕ Add Employee'}
                         </button>
                     </form>

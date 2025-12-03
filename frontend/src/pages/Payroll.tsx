@@ -143,7 +143,7 @@ function Payroll() {
 
                     <form onSubmit={handleFund}>
                         <div className="form-group">
-                            <label>Amount (USDT)</label>
+                            <label>Amount (In Tokens)</label>
                             <input
                                 type="number"
                                 placeholder="10000"
@@ -154,7 +154,7 @@ function Payroll() {
                                 className="glass-input"
                             />
                         </div>
-                        <button type="submit" className="btn-secondary full-width" disabled={loading}>
+                        <button type="submit" className="btn-secondary full-width" disabled={loading} style={{marginTop: '0.5rem'}}>
                             {loading ? 'Processing...' : 'Fund Contract'}
                         </button>
                     </form>
@@ -179,7 +179,7 @@ function Payroll() {
                                 className="glass-input"
                             />
                         </div>
-                        <button type="submit" className="btn-secondary full-width" disabled={loading}>
+                        <button type="submit" className="btn-secondary full-width" disabled={loading} style={{marginTop: '0.5rem'}}>
                             {loading ? 'Processing...' : 'Pay Employee'}
                         </button>
                     </form>

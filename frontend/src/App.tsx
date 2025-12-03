@@ -10,9 +10,11 @@ import EmployeeDashboard from './pages/EmployeeDashboard';
 import Invoices from './pages/Invoices';
 import Sidebar from './components/Sidebar';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
+import { useIsOwner } from './hooks/isOwner';
 
 function App() {
     const { isConnected } = useAccount();
+    const isOwner = useIsOwner();
 
     return (
         <Router>
@@ -32,7 +34,7 @@ function App() {
                                         <header className="dashboard-header glass-card">
                                             <div className="header-title">
                                                 <h2>BORDERLESS PAY</h2>
-                                                <span className="subtitle">Dashboard</span>
+                                                {isOwner ? <span className="subtitle">OWNER DASHBOARD</span> : <span className="subtitle">DASHBOARD</span>}
                                             </div>
                                             <ConnectButton />
                                         </header>

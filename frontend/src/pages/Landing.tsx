@@ -25,7 +25,7 @@ const Landing = () => {
 
             {/* Hero Section */}
             <section className="hero-section">
-                <div className="container" style={{ textAlign: 'center', paddingTop: '8rem', paddingBottom: '6rem' }}>
+                <div className="container" style={{ textAlign: 'center', paddingTop: '8rem', paddingBottom: '0rem' }}>
                     <div className="animate-float">
                         <span className="badge-glass">Powered by QIE Oracles</span>
                     </div>
@@ -52,7 +52,7 @@ const Landing = () => {
             </section>
 
             {/* How It Works */}
-            <section className="how-it-works" style={{ padding: '6rem 0' }}>
+            <section className="how-it-works" style={{ padding: '6rem 0 0' }}>
                 <div className="container">
                     <h2 className="text-center text-gradient" style={{ marginBottom: '3rem', fontSize: '2.5rem', textAlign: 'center' }}>How It Works</h2>
                     <div className="timeline">
